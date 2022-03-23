@@ -10,6 +10,7 @@ public class controlled_behaviour : Brain
     KeyCode tri;
     KeyCode penta;
     KeyCode dia;
+    KeyCode exp;
     void Start()
     {
         calcSpawn();
@@ -19,13 +20,16 @@ public class controlled_behaviour : Brain
             dia = KeyCode.W;
             tri = KeyCode.E;
             penta = KeyCode.R;
+            exp = KeyCode.T;
+            
         }
         else
         {
-            squ = KeyCode.U;
-            dia = KeyCode.I;
-            tri = KeyCode.O;
-            penta = KeyCode.P;
+            squ = KeyCode.Y;
+            dia = KeyCode.U;
+            tri = KeyCode.I;
+            penta = KeyCode.O;
+            exp = KeyCode.P;
         }
     }
 
@@ -40,13 +44,16 @@ public class controlled_behaviour : Brain
         {
             spawnDiamond();
         }
-        else if(Input.GetKeyUp(tri))
+        else if (Input.GetKeyUp(tri))
         {
             spawnTriangle();
         }
         else if (Input.GetKeyUp(penta))
         {
             spawnPentagon();
+        }
+        else if (Input.GetKeyUp(exp)) {
+            explode();
         }
 
     }

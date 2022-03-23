@@ -10,6 +10,15 @@ public class towerBehabiour : MonoBehaviour, IUnit
     public GameObject main;
     Main src;
 
+    private float range = 3;
+    private int power = 5;
+    private float attSpeed = 1.5f;
+    // -------------------
+
+    private float nextDmgEvent;
+    public int direction;
+    public LayerMask targetLayer;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -29,6 +38,20 @@ public class towerBehabiour : MonoBehaviour, IUnit
             src.endGame(team * -1);
             Destroy(this.gameObject);
         }
+        Vector2 position = transform.position + new Vector3(0.6f * direction, -1, 0);
+        Vector2 towards = transform.right * direction;
+        Debug.DrawRay(position, towards * range, Color.green);
+        RaycastHit2D hit = Physics2D.Raycast(position, towards, range, targetLayer);
+        if (hit.collider != null)
+        {
+            if (Time.time >= nextDmgEvent)
+            {
+                nextDmgEvent = Time.time + 1 / attSpeed;
+                IUnit src = hit.collider.gameObject.GetComponent<IUnit>();
+                src.dealDamage(power);
+            }
+        }
+
     }
 
     public void dealDamage(int p)

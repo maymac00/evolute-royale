@@ -39,6 +39,7 @@ public abstract class Brain : MonoBehaviour
             sq.tag = s;
             sq.layer = src.direction == 1 ? 8 : 9;
             sq.GetComponent<SpriteRenderer>().color = src.direction == 1 ? Color.green : Color.red;
+            sq.name = src.direction == 1 ? "Ally" : "Enemy";
         }
     }
 
@@ -57,6 +58,7 @@ public abstract class Brain : MonoBehaviour
             sq.tag = s;
             sq.layer = src.direction == 1 ? 8 : 9;
             sq.GetComponent<SpriteRenderer>().color = src.direction == 1 ? Color.green : Color.red;
+            sq.name = src.direction == 1 ? "Ally" : "Enemy";
         }
     }
 
@@ -76,6 +78,7 @@ public abstract class Brain : MonoBehaviour
             sq.tag = s;
             sq.layer = src.direction == 1 ? 8 : 9;
             sq.GetComponent<SpriteRenderer>().color = src.direction == 1 ? Color.green : Color.red;
+            sq.name = src.direction == 1 ? "Ally" : "Enemy";
         }
     }
 
@@ -96,9 +99,17 @@ public abstract class Brain : MonoBehaviour
             sq.tag = s;
             sq.layer = src.direction == 1 ? 8 : 9;
             sq.GetComponent<SpriteRenderer>().color = src.direction == 1 ? Color.green : Color.red;
+            sq.name = src.direction == 1 ? "Ally" : "Enemy";
         }
     }
-
+    protected void explode() {
+        if (gold >= 7) {
+            Transform[] children = transform.parent.GetComponentsInChildren<Transform>();
+            for (int i = 11; i < children.Length; i++) {
+                Debug.Log("");
+            }
+        }
+    }
     
 }
 

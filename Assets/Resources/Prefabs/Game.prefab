@@ -250,11 +250,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5c65781a4dc3c64ea5629f082f13c16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 200
+  health: 100
   healthPrefab: {fileID: 3371812161475642787, guid: b586f41d0e4a6cd42811d977e106cdac,
     type: 3}
   team: 1
   main: {fileID: 2913059538841458256}
+  direction: 1
+  targetTag: 
+  targetLayer:
+    serializedVersion: 2
+    m_Bits: 512
 --- !u!1 &2913059538421707133
 GameObject:
   m_ObjectHideFlags: 0
@@ -469,11 +474,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5c65781a4dc3c64ea5629f082f13c16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 200
+  health: 100
   healthPrefab: {fileID: 3371812161475642787, guid: b586f41d0e4a6cd42811d977e106cdac,
     type: 3}
   team: -1
   main: {fileID: 2913059538841458256}
+  direction: -1
+  targetTag: 
+  targetLayer:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!1 &2913059538841458256
 GameObject:
   m_ObjectHideFlags: 0
