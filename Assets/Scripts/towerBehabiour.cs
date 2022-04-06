@@ -34,8 +34,11 @@ public class towerBehabiour : MonoBehaviour, IUnit
     {
         //am i dead
         if (health <= 0)
-        { 
-            src.endGame(team * -1);
+        {
+            towerBehabiour ta = gameObject.transform.parent.transform.GetChild(0).gameObject.GetComponent<towerBehabiour>();
+            towerBehabiour te = gameObject.transform.parent.transform.GetChild(1).gameObject.GetComponent<towerBehabiour>();
+            int diff = ta.health - te.health;            
+            src.endGame(diff);
             Destroy(this.gameObject);
         }
         Vector2 position = transform.position + new Vector3(0.6f * direction, -1, 0);
@@ -46,7 +49,7 @@ public class towerBehabiour : MonoBehaviour, IUnit
         {
             if (Time.time >= nextDmgEvent)
             {
-                nextDmgEvent = Time.time + 1 / attSpeed;
+                nextDmgEvent = Time.time + 1 / (attSpeed * NEAT.game_speed);
                 IUnit src = hit.collider.gameObject.GetComponent<IUnit>();
                 src.dealDamage(power);
             }

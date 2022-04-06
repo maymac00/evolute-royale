@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 public static class NEAT
 {
+    public static float game_speed = 1.0f;
+
     public static int dropoff = 15;
     public static int blood_rate = 3;
     public static double max_reward = 500.0;
@@ -11,7 +13,7 @@ public static class NEAT
     public static float new_link_mutation_rate = 0.05f;
     public static float weight_mutation_rate = 0.9f;
     public static int n_innovations = 0;
-    public static Dictionary<int, ConnectionGene> innovations = new Dictionary<int, ConnectionGene>();
+    public static Dictionary<ConnectionGene, int> innovations = new Dictionary<ConnectionGene, int>();
 
     public static int max_len = 0;
     public static float step = 2.5f;
@@ -32,7 +34,16 @@ public static class NEAT
 
     public static void check_innovation(ConnectionGene connectionGene)
     {
-        throw new NotImplementedException();
+        if (innovations.ContainsKey(connectionGene))
+        {
+            connectionGene.innovation = NEAT.innovations[connectionGene];
+        }
+        else
+        {
+            NEAT.innovations[connectionGene] = NEAT.n_innovations;
+            connectionGene.innovation = NEAT.n_innovations;
+            NEAT.n_innovations++;
+        }
     }
 
     public static float f_activation_function(float x)

@@ -25,11 +25,23 @@ public class ConnectionGene
     }
 
     public static bool operator ==(ConnectionGene lcg, ConnectionGene rcg) {
-        return lcg.input == rcg.input && lcg.output == rcg.output; 
+        return lcg.input == rcg.input && lcg.output == rcg.output;
     }
 
     public static bool operator !=(ConnectionGene lcg, ConnectionGene rcg)
     {
         return lcg.input != rcg.input || lcg.output != rcg.output;
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked // Overflow is fine, just wrap
+        {
+            int hash = 17;
+            // Suitable nullity checks etc, of course :)
+            hash = hash * 23 + input.GetHashCode();
+            hash = hash * 23 + output.GetHashCode();
+            return hash;
+        }
     }
 }

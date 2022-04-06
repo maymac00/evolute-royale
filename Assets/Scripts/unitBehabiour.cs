@@ -12,6 +12,7 @@ public class unitBehabiour : MonoBehaviour, IUnit
     // Start is called before the first frame update
     public GameObject tower;
     public GameObject healthPrefab;
+    public Brain controller;
 
 
     //STATS
@@ -43,6 +44,7 @@ public class unitBehabiour : MonoBehaviour, IUnit
         //am i dead
         if(health <= 0)
         {
+
             Destroy(gameObject);
         }
 
@@ -56,7 +58,7 @@ public class unitBehabiour : MonoBehaviour, IUnit
             {
                 if (Time.time >= nextDmgEvent)
                 {
-                    nextDmgEvent = Time.time + 1 / attSpeed;
+                    nextDmgEvent = Time.time + 1 / (attSpeed*NEAT.game_speed);
                     IUnit src = hit.collider.gameObject.GetComponent<IUnit>();
                     src.dealDamage(power);
                 }
@@ -65,8 +67,8 @@ public class unitBehabiour : MonoBehaviour, IUnit
         }
         else
         {
-            transform.position += transform.right * direction * MoveSpeed * Time.deltaTime;
-            nextDmgEvent = Time.time + 1/attSpeed;
+            transform.position += transform.right * direction * MoveSpeed * NEAT.game_speed * Time.deltaTime;
+            nextDmgEvent = Time.time + 1/ (attSpeed * NEAT.game_speed);
         }
     }
 

@@ -12,7 +12,7 @@ public class Individual
 
     public int n_neurons;
 
-    public List<List<ConnectionGene>> matrix;
+    public List<List<ConnectionGene>> matrix = new List<List<ConnectionGene>>();
 
     public Dictionary<int, ConnectionGene> genome;
 
@@ -30,9 +30,10 @@ public class Individual
 
         for (int i = 0; i < n_neurons; i++)
         {
+            matrix.Add(new List<ConnectionGene>());
             for (int j = 0; j < n_neurons; j++)
             {
-                matrix.Add(null);
+                matrix[i].Add(null);
             }
         }
 
@@ -107,7 +108,7 @@ public class Individual
                 int i = c[0];
                 int o = c[1];
 
-                if (matrix[i][o] == null)
+                if (matrix[i][o] is null)
                 {
                     add_connection(i, o);
                     break;
@@ -156,14 +157,13 @@ public class Individual
 
             List<int> aux = new List<int>(input);
             aux.AddRange(output);
-            foreach (int i in aux)
-            {
-                foreach (int j in aux)
+            for (int i = 0; i < aux.Count; i++) {
+                for (int j = i+1; j < aux.Count; j++)
                 {
-                    if (i != j)
-                        perms.Add(new List<int>(new int[] { i, j }));
+                    perms.Add(new List<int>(new int[] { aux[i], aux[j] }));
                 }
             }
+
 
             while (perms.Count != 0)
             {
@@ -171,7 +171,7 @@ public class Individual
                 int i = c[0];
                 int o = c[1];
 
-                if (matrix[i][o] == null)
+                if (matrix[i][o] is null)
                 {
                     add_connection(i, o);
                     break;
@@ -200,7 +200,7 @@ public class Individual
         }
     }
 
-    public float[] process(int[] inputs)
+    public float[] process(float[] inputs)
     {
         if(inputs.Length != input.Count)
         {
@@ -215,10 +215,11 @@ public class Individual
         }
 
         float[] res = new float[output.Count];
-
-        for (int j = 0; j < inputs.Length; j++)
+        int i = 0;
+        foreach (int j in output)
         {
-            res[j] = NEAT.f_activation_function(backrec(j, results, new List<int>()));
+            res[i] = NEAT.f_activation_function(backrec(j, results, new List<int>()));
+            i++;
         }
         return res;
     }
@@ -238,11 +239,13 @@ public class Individual
         for (int i = 0; i < n_neurons; i++)
         {
             ConnectionGene entry = matrix[i][neuron];
-            if(entry != null && entry.enable)
+            if(!(entry is null))
             {
-                visited.Add(neuron);
-                res += backrec(i, results, visited) * entry.w;
-                visited.Remove(neuron);
+                if (entry.enable) {
+                    visited.Add(neuron);
+                    res += backrec(i, results, visited) * entry.w;
+                    visited.Remove(neuron);
+                }     
             }
         }
         results[neuron] = NEAT.f_inner_activation_function(res);

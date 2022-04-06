@@ -4,16 +4,44 @@ using UnityEngine;
 
 public class coded_behaviour : Brain
 {
+    int[] actions;
+    int i;
     // Start is called before the first frame update
     void Start()
     {
         calcSpawn();
-        spawnPentagon();
+        int[] aux = { 0, 0, 1, 0, 0, 2, 3, 2};
+        actions = aux;
+        i = 0;
+        InvokeRepeating("act", 1, (float)(1 / NEAT.game_speed));
     }
 
-    // Update is called once per frame
-    void Update()
+    public void act()
     {
-        Debug.Log("holaa");
+        int action = actions[i];
+        bool r = false;
+        switch (action)
+        {
+            case 0:
+                r = spawnSquare();
+                break;
+            case 1:
+                r = spawnDiamond();
+                break;
+            case 2:
+                r = spawnTriangle();
+                break;
+            case 3:
+                r = spawnPentagon();
+                break;
+        }
+        if (r)
+        {
+            i++;
+            if (i >= actions.Length)
+            {
+                i = 0;
+            }
+        }
     }
 }

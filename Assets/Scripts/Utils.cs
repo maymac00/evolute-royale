@@ -73,6 +73,19 @@ public static class Utils
         return res;
     }
 
+    public static float Max(float[] l)
+    {
+        float res = l[0];
+        foreach (float it in l)
+        {
+            if (res > it)
+            {
+                res = it;
+            }
+        }
+        return res;
+    }
+
     public static int Min(List<int> l)
     {
         int res = l[0];
@@ -84,5 +97,48 @@ public static class Utils
             }
         }
         return res;
+    }
+
+    public static float Min(float[] l)
+    {
+        float res = l[0];
+        foreach (float it in l)
+        {
+            if (res < it)
+            {
+                res = it;
+            }
+        }
+        return res;
+    }
+
+    public static int Min_index(float[] l)
+    {
+        int res = 0;
+        for (int i = 1; i < l.Length; i++) {
+            if (l[res] < l[i])
+            {
+                res = i;
+            }
+        }
+        return res;
+    }
+
+    public static int Max_index(float[] l)
+    {
+        int res = 0;
+        for (int i = 1; i < l.Length; i++)
+        {
+            if (l[res] > l[i])
+            {
+                res = i;
+            }
+        }
+        return res;
+    }
+
+    public static float normalize(float value, float min, float max)
+    {
+        return (value - min) / (max - min);
     }
 }

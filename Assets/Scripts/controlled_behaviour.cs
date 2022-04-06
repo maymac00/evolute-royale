@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class controlled_behaviour : Brain
+public class controlled_behaviour : Brain, IBehabiour
 {
     // Start is called before the first frame update
     public string team;
@@ -34,7 +34,12 @@ public class controlled_behaviour : Brain
     }
 
     // Update is called once per frame
-    void Update()
+    void Update(){
+        act();
+    }
+    
+
+    public void act(float[] inputs = null)
     {
         if (Input.GetKeyUp(squ))
         {
