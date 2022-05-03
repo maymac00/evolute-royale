@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using Random = UnityEngine.Random;
+
 public static class NEAT
 {
     public static float game_speed = 1.0f;
@@ -12,8 +15,10 @@ public static class NEAT
     public static float new_node_mutation_rate = 0.03f;
     public static float new_link_mutation_rate = 0.05f;
     public static float weight_mutation_rate = 0.9f;
-    public static int n_innovations = 0;
+    public static int n_innovations = 1;
     public static Dictionary<ConnectionGene, int> innovations = new Dictionary<ConnectionGene, int>();
+    public static int[] innovations_arr = new int[2048];
+
 
     public static int max_len = 0;
     public static float step = 2.5f;
@@ -21,7 +26,7 @@ public static class NEAT
     public static int reps = 1;
     public static string opt = "max";
 
-    public static float distance_thld = 3.0f;
+    public static float distance_thld = 4.0f;
     public static float c1 = 1.0f; // Disjoint
     public static float c2 = 1.0f; // Excess
     public static float c3 = 0.3f; // Weight
@@ -34,13 +39,15 @@ public static class NEAT
 
     public static void check_innovation(ConnectionGene connectionGene)
     {
-        if (innovations.ContainsKey(connectionGene))
+        int i = connectionGene.input;
+        int j = connectionGene.output;
+        if (NEAT.innovations_arr[connectionGene.GetHashCode()] != 0)
         {
-            connectionGene.innovation = NEAT.innovations[connectionGene];
+            connectionGene.innovation = NEAT.innovations_arr[connectionGene.GetHashCode()];
         }
         else
         {
-            NEAT.innovations[connectionGene] = NEAT.n_innovations;
+            NEAT.innovations_arr[connectionGene.GetHashCode()] = NEAT.n_innovations;
             connectionGene.innovation = NEAT.n_innovations;
             NEAT.n_innovations++;
         }
@@ -72,8 +79,34 @@ public static class NEAT
         }
     }
 
-    public static float fitness(Individual ind)
+    public static Individual crossover(Individual ind1, Individual ind2)
     {
-        return 0;
+        if (ind1.fitness > ind2.fitness)
+        {
+            Individual temp = ind1;
+            ind1 = ind2;
+            ind2 = temp;
+        }
+
+        Dictionary<int, ConnectionGene> genome1 = ind1.genome;
+        Dictionary<int, ConnectionGene> genome2 = ind2.genome;
+
+        List<ConnectionGene> genome3 = new List<ConnectionGene>();
+
+        for (int i = 0; i < genome1.Count; i++)
+        {
+            ConnectionGene connectionGene = genome1.Values.ToArray()[i];
+            if (genome2.ContainsKey(connectionGene.innovation) && genome2[connectionGene.innovation].enable && Random.Range(0, 1) < 0.5f)
+            {
+                genome3.Add(genome2[connectionGene.innovation]);
+            }
+            else
+            {
+                genome3.Add(connectionGene);
+            }
+        }
+        
+        return IndividualFactory.buildIndividual(ind1.input.Count, ind1.output.Count, genome3);
     }
+
 }

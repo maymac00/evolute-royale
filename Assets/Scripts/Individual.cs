@@ -10,14 +10,19 @@ public class Individual
     public List<int> output;
     public List<int> hidden;
 
+    public static God god;
+
+    public Specie specie;
+
     public int n_neurons;
 
     public List<List<ConnectionGene>> matrix = new List<List<ConnectionGene>>();
 
     public Dictionary<int, ConnectionGene> genome;
 
-    public float fitness = -1.0f;
     public float adj_fitness = -1.0f;
+    public float fitness = -1.0f;
+    public int pos;
 
     public Individual(int inp = -1, int _output = -1)
     {
@@ -43,6 +48,7 @@ public class Individual
 
     public int add_connection(int i, int o)
     {
+
         ConnectionGene n = new ConnectionGene(i, o);
         genome[n.innovation] = n;
         matrix[i][o] = n;
@@ -62,16 +68,25 @@ public class Individual
         {
             l.Add(null);
         }
-        matrix.Add(new List<ConnectionGene>(n_neurons));
+        List<ConnectionGene> aux = new List<ConnectionGene>();
+        for (int j = 0; j < n_neurons+1; j++)
+            aux.Add(null);
+
+        matrix.Add(aux);
+
 
         matrix[i][n_neurons] = n1;
         matrix[n_neurons][o] = n2;
 
+
         hidden.Add(n_neurons);
+
+        n_neurons++;
+        
 
         NEAT.max_len = Mathf.Max(NEAT.max_len, genome.Count);
 
-        n_neurons++;
+        
     }
 
     public void mutate()
@@ -90,16 +105,18 @@ public class Individual
         if (Random.Range(0, 1) < NEAT.new_link_mutation_rate)
         {
             List<List<int>> perms = new List<List<int>>();
-            perms.AddRange(Permutations.permute(hidden));
-
-            List<int> aux = new List<int>(input);
-            aux.AddRange(output);
-            foreach (int i in aux)
+            
+            List<int> outs = new List<int>(output);
+            outs.AddRange(hidden);
+            List<int> ins = new List<int>(input);
+            ins.AddRange(hidden);
+            
+            foreach (int i in ins)
             {
-                foreach (int j in aux)
+                foreach (int o in outs)
                 {
-                    if (i != j)
-                        perms.Add(new List<int>(new int[] { i, j }));
+                    if(i != o)
+                        perms.Add(new List<int>() { i, o});
                 }
             }
 
@@ -153,17 +170,20 @@ public class Individual
         if (Random.Range(0, 1) < 0.5f)
         {
             List<List<int>> perms = new List<List<int>>();
-            perms.AddRange(Permutations.permute(hidden));
 
-            List<int> aux = new List<int>(input);
-            aux.AddRange(output);
-            for (int i = 0; i < aux.Count; i++) {
-                for (int j = i+1; j < aux.Count; j++)
+            List<int> outs = new List<int>(output);
+            outs.AddRange(hidden);
+            List<int> ins = new List<int>(input);
+            ins.AddRange(hidden);
+
+            foreach (int i in ins)
+            {
+                foreach (int o in outs)
                 {
-                    perms.Add(new List<int>(new int[] { aux[i], aux[j] }));
+                    if (i != o)
+                        perms.Add(new List<int>() { i, o });
                 }
             }
-
 
             while (perms.Count != 0)
             {
@@ -275,11 +295,14 @@ public class Individual
         List<int> differ = new List<int>(disjoint1);
 
         int disjoint = 0;
-        int i = differ[0];
-        while(i <= border)
+        if (differ.Count > 0)
         {
-            i = differ[disjoint];
-            disjoint++;
+            int i = differ[0];
+            while (i <= border)
+            {
+                i = differ[disjoint];
+                disjoint++;
+            }
         }
 
         int excess = differ.Count - disjoint;
@@ -304,6 +327,22 @@ public class Individual
 
     public void score()
     {
-        fitness = NEAT.fitness(this);
+        Arena a = god.getArena();
+        while (a is null)
+        {
+            WaitForSeconds w = new WaitForSeconds(1.0f);
+            a = god.getArena();
+        }
+        int i = a.coords[0];
+        int j = a.coords[1];
+        god.spawn_game(this, i, j);
+
+    }
+    public void notifyWin(Main m)
+    {
+        god.arena[m.coords[0], m.coords[1]] = 0;
+        fitness = m.ally_fitness;
+        specie.fitness[pos] = fitness;
+
     }
 }

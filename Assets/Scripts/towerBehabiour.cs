@@ -18,6 +18,7 @@ public class towerBehabiour : MonoBehaviour, IUnit
     private float nextDmgEvent;
     public int direction;
     public LayerMask targetLayer;
+    public int target_health;
 
     // Start is called before the first frame update
     void Start()
@@ -39,7 +40,15 @@ public class towerBehabiour : MonoBehaviour, IUnit
             towerBehabiour te = gameObject.transform.parent.transform.GetChild(1).gameObject.GetComponent<towerBehabiour>();
             int diff = ta.health - te.health;            
             src.endGame(diff);
-            Destroy(this.gameObject);
+            Destroy(this.gameObject, 1);
+            //destroy all child objects except the first 3
+            for (int i = 4; i < gameObject.transform.parent.transform.childCount; i++)
+            {
+                Destroy(gameObject.transform.parent.transform.GetChild(i).gameObject);
+            }
+
+
+
         }
         Vector2 position = transform.position + new Vector3(0.6f * direction, -1, 0);
         Vector2 towards = transform.right * direction;

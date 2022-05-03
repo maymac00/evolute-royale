@@ -14,11 +14,14 @@ public static class IndividualFactory
             aux.AddRange(ind.hidden);
             if (!aux.Contains(gen.output))
             {
+                List<ConnectionGene> new_row = new List<ConnectionGene>();
                 foreach (List<ConnectionGene> l in ind.matrix)
                 {
                     l.Add(null);
+                    new_row.Add(null);
                 }
-                ind.matrix.Add(new List<ConnectionGene>(ind.n_neurons));
+                new_row.Add(null);
+                ind.matrix.Add(new_row);
                 ind.hidden.Add(gen.output);
                 ind.n_neurons++;
             }

@@ -13,7 +13,6 @@ public abstract class Brain : MonoBehaviour
     public GameObject prefabPentagon;
     public GameObject prefabDiamond;
     public Vector3 position;
-    
 
     public int[] units = new int[4];
     public int gold = 0;
@@ -21,6 +20,9 @@ public abstract class Brain : MonoBehaviour
     public string log;
     protected Vector3[] spawnPoints = new Vector3[4];
     public int direction;
+
+    public int winner;
+    public int diff;
 
     protected void calcSpawn()
     {
@@ -159,7 +161,11 @@ public class Main : MonoBehaviour
     public Individual enemy_ind;
     public Vector3 position;
     public int[] coords;
-    public God god = null;
+    public Specie g = null;
+
+    public int ally_fitness;
+    public int enemy_fitness;
+
 
     public int timer = 0;
     public int time_limit = 120;
@@ -396,19 +402,25 @@ public class Main : MonoBehaviour
 
     }
 
+    public delegate void gameFinishedDelegate(Main p);
+    public event gameFinishedDelegate gameFinishedEvent;
+    
     public void endGame(int diff)
     {
         //Finish game, set winner etc...
         winner = diff >= 0 ? 1 : 0;
-        
+        this.diff = diff;
+
+        ally_fitness = (int)Utils.Max(diff + 150 - timer * 0.5f, 0.0f);
+        enemy_fitness = (int)Utils.Max(diff*-1 + 150 - timer * 0.5f, 0.0f);
+
+
         CancelInvoke("secondUpdate");
         if(ally_controller == "evolutive" || enemy_controller == "evolutive")
-            CancelInvoke("evolutive");
+            CancelInvoke("evolutive");   
 
         Debug.Log("End game");
-        god.fitnesses[coords[0], coords[1]] = diff;
-        
-
-        Destroy(gameObject.transform.parent.gameObject, 2);
+        Destroy(gameObject.transform.parent.gameObject, 1f);
+        gameFinishedEvent(this);
     }
 }

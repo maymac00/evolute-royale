@@ -136,9 +136,58 @@ public static class Utils
         }
         return res;
     }
+    public static T Max<T>(T lhs, T rhs)
+    {
+        return Comparer<T>.Default.Compare(lhs, rhs) > 0 ? lhs : rhs;
+    }
 
     public static float normalize(float value, float min, float max)
     {
         return (value - min) / (max - min);
+    }
+
+    public static List<Individual> insert_sorted(List<Individual> l, Individual i)
+    {
+        int n = l.Count;
+        for (int j = 0; j < n; j++)
+        {
+            if (l[j].fitness > i.fitness)
+            {
+                l.Insert(j, i);
+                return l;
+            }
+        }
+        l.Add(i);
+        return l;
+    }
+
+    public static float sum(float[] l)
+    {
+        float res = 0;
+        foreach (float it in l)
+        {
+            res += it;
+        }
+        return res;
+    }
+
+    public static float mean(float[] l)
+    {
+        return sum(l) / l.Length;
+    }
+
+    public static float sum(List<float> l)
+    {
+        float res = 0;
+        foreach (float it in l)
+        {
+            res += it;
+        }
+        return res;
+    }
+
+    public static float mean(List<float> l)
+    {
+        return sum(l) / l.Count;
     }
 }
