@@ -76,8 +76,16 @@ public class unitBehabiour : MonoBehaviour, IUnit
     void IUnit.dealDamage(int p)
     {
         health -= p;
-        healthBar lifes = this.gameObject.transform.GetChild(0).GetComponent<healthBar>();
-        lifes.update();
+        try
+        {
+            healthBar lifes = this.gameObject.transform.GetComponentInChildren<healthBar>();
+            lifes.update();
+        }
+        catch
+        {
+
+        }
+        
     }
 
     public string getHealth()

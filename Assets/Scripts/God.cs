@@ -178,6 +178,7 @@ public class God : MonoBehaviour
         
         if (empty_arena())
         {
+            Debug.Log("Start selection");
             foreach (Specie s in species)
             {
                 s.adjust_scores();
@@ -192,6 +193,7 @@ public class God : MonoBehaviour
 
             natural_selection();
             n_gens++;
+            
             next_gen();
         }
         
@@ -238,8 +240,8 @@ public class God : MonoBehaviour
 
     public void next_gen()
     {
-        WaitForSeconds wait = new WaitForSeconds(2);
-
+        Debug.Log("Start next_gen");
+        
         foreach (Specie s in species)
         {
             s.mutate();
@@ -263,21 +265,22 @@ public class God : MonoBehaviour
         }
         float S = Utils.sum(means);
         List<Specie> spc = new List<Specie>(species);
-        List<Individual> migrations = new List<Individual>();
+        species = new List<Specie>();
 
         foreach (Specie s in spc)
         {
-            int n = (int) (Utils.mean(s.adj_fitness) / S * P);
+            int n = (int)(Utils.mean(s.adj_fitness) / S * P);
             if (n > s.individuals.Count * 2)
             {
-                n = s.individuals.Count*2;
+                n = s.individuals.Count * 2;
             }
             if (n < s.individuals.Count * 0.5f)
             {
                 n = (int)(s.individuals.Count * 0.5f);
             }
-            
-            if(n > 0 && s.uselessness < NEAT.dropoff)
+
+
+            if (n > 0 && s.uselessness < NEAT.dropoff)
             {
                 List<Individual> offspring = s.getOffspring(n);
                 s.individuals = new List<Individual>();
@@ -288,21 +291,14 @@ public class God : MonoBehaviour
             }
             else
             {
-                int index = Utils.Max_index(s.fitness);
-                migrations.Add(s.individuals[index]);
                 s.individuals = new List<Individual>();
             }
-
-            // rebuild list of species so there isn't any specie with no individuals
-            List<Specie> species_aux = new List<Specie>();
-            foreach (Specie s1 in spc)
-            {
-                if (s1.individuals.Count > 0)
-                {
-                    species.Add(s1);
-                }
-            }
-
         }
+
+        // rebuild list of species so there isn't any specie with no individuals
+        List<Specie> species_aux = new List<Specie>();
+
+        
+        Debug.Log("End of natural selection");
     }
 }

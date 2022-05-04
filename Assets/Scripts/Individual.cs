@@ -116,7 +116,7 @@ public class Individual
                 foreach (int o in outs)
                 {
                     if(i != o)
-                        perms.Add(new List<int>() { i, o});
+                        perms.Add(new List<int>() {i, o});
                 }
             }
 
@@ -125,15 +125,23 @@ public class Individual
                 int i = c[0];
                 int o = c[1];
 
-                if (matrix[i][o] is null)
+                try
                 {
-                    add_connection(i, o);
-                    break;
+                    if (matrix[i][o] is null)
+                    {
+                        add_connection(i, o);
+                        break;
+                    }
+                    else
+                    {
+                        perms.Remove(c);
+                    }
                 }
-                else
+                catch
                 {
                     perms.Remove(c);
                 }
+
             }
         }
 

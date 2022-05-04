@@ -25,10 +25,18 @@ public static class IndividualFactory
                 ind.hidden.Add(gen.output);
                 ind.n_neurons++;
             }
-            int n = ind.add_connection(gen.input, gen.output);
-            ind.genome[n].w = gen.w;
-            ind.genome[n].enable = gen.enable;
-            ind.genome[n].innovation = gen.innovation;
+            try
+            {
+                int n = ind.add_connection(gen.input, gen.output);
+                ind.genome[n].w = gen.w;
+                ind.genome[n].enable = gen.enable;
+                ind.genome[n].innovation = gen.innovation;
+            }
+            catch
+            {
+                Debug.Log(gen.input.ToString() +" "+ gen.output.ToString());
+            }
+            
         }
         return ind;
     }
