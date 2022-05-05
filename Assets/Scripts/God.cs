@@ -33,10 +33,13 @@ public class God : MonoBehaviour
 
     public int n_gens = 0;
 
-    public int n = 64;
-
     public List<Specie> species = new List<Specie>();
     public bool finished_gen = false;
+
+    public String type_of_training = "against_hc";
+    public readonly int N_INDS = 32;
+    public readonly int N_MAX_GENS = 2;
+    public List<Individual> hall_of_fame = new List<Individual>();
 
     // Start is called before the first frame update
     void Start()
@@ -57,16 +60,17 @@ public class God : MonoBehaviour
                 arena[i, j] = 0;
             }
         }
-
-        Individual[] population = new Individual[64];
+        
+        Individual[] population = new Individual[N_INDS];
         Individual.god = this;
        
         for (int i = 0; i < population.Length; i++)
         {
             population[i] = new Individual(12,5);
-            for (int j = 0; j < 16; j++)
+            for (int j = 0; j < 10; j++)
             {
                 population[i].force_mutate();
+                print("mutated");
             }
             speciate(population[i]);
         }
@@ -176,13 +180,28 @@ public class God : MonoBehaviour
             textmesh.text = grid_x.ToString() + "," + grid_y.ToString();
         }
         
+        
+        if (n_gens < N_MAX_GENS)
+        {
+            Destroy(gameObject);
+        }
         if (empty_arena())
         {
-            Debug.Log("Start selection");
+            
             foreach (Specie s in species)
             {
                 s.adjust_scores();
             }
+
+            float mean_score = 0;
+
+            // Calculate the mean score of the species
+            foreach (Specie s in species)
+            {
+                mean_score += s.averageFitness;
+            }
+            mean_score /= species.Count;
+            Debug.Log("Last gen has a mean score of: " + mean_score);
 
             //sort species by average_fitness
             species.Sort((x, y) => y.averageFitness.CompareTo(x.averageFitness));
@@ -193,7 +212,7 @@ public class God : MonoBehaviour
 
             natural_selection();
             n_gens++;
-            
+
             next_gen();
         }
         
@@ -257,7 +276,9 @@ public class God : MonoBehaviour
 
     private void natural_selection()
     {
-        int P = n;
+        hall_of_fame.Add(species[0].individuals[0]);
+
+        int P = N_INDS;
         List<float> means = new List<float>();
         for (int i = 0; i < species.Count; i++)
         {
@@ -269,20 +290,20 @@ public class God : MonoBehaviour
 
         foreach (Specie s in spc)
         {
-            int n = (int)(Utils.mean(s.adj_fitness) / S * P);
-            if (n > s.individuals.Count * 2)
+            int n_ind = (int)(Utils.mean(s.adj_fitness) / S * P);
+            if (n_ind > s.individuals.Count * 2)
             {
-                n = s.individuals.Count * 2;
+                n_ind = s.individuals.Count * 2;
             }
-            if (n < s.individuals.Count * 0.5f)
+            if (n_ind < s.individuals.Count * 0.5f)
             {
-                n = (int)(s.individuals.Count * 0.5f);
+                n_ind = (int)(s.individuals.Count * 0.5f);
             }
+            
 
-
-            if (n > 0 && s.uselessness < NEAT.dropoff)
+            if (n_ind > 0 && s.uselessness < NEAT.dropoff)
             {
-                List<Individual> offspring = s.getOffspring(n);
+                List<Individual> offspring = s.getOffspring(n_ind);
                 s.individuals = new List<Individual>();
                 foreach (Individual i in offspring)
                 {
@@ -295,10 +316,9 @@ public class God : MonoBehaviour
             }
         }
 
-        // rebuild list of species so there isn't any specie with no individuals
-        List<Specie> species_aux = new List<Specie>();
+        NEAT.distance_thld += 0.3f;
 
-        
-        Debug.Log("End of natural selection");
+
+        Debug.Log("Species: " + species.Count);
     }
 }

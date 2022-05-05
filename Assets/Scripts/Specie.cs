@@ -34,8 +34,10 @@ public class Specie
 
     public void adjust_scores()
     {
+        individuals.Sort();
         adj_fitness = new float[individuals.Count];
         float sum = Utils.sum(fitness);
+        averageFitness = sum / fitness.Length;
         averageFitness = sum / fitness.Length;
         if(fitness.Length > 0)
             bestFitness = Utils.Max(fitness);

@@ -12,8 +12,10 @@ public static class NEAT
     public static int dropoff = 15;
     public static int blood_rate = 3;
     public static double max_reward = 500.0;
-    public static float new_node_mutation_rate = 0.03f;
-    public static float new_link_mutation_rate = 0.05f;
+    //public static float new_node_mutation_rate = 0.03f;
+    public static float new_node_mutation_rate = 0.3f;
+    //public static float new_link_mutation_rate = 0.05f;
+    public static float new_link_mutation_rate = 0.2f;
     public static float weight_mutation_rate = 0.9f;
     public static int n_innovations = 1;
     public static Dictionary<ConnectionGene, int> innovations = new Dictionary<ConnectionGene, int>();

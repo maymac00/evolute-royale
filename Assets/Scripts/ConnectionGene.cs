@@ -1,8 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
-public class ConnectionGene
+public class ConnectionGene : IComparable
 {
 
     public int input;
@@ -33,10 +35,25 @@ public class ConnectionGene
         return lcg.input != rcg.input || lcg.output != rcg.output;
     }
 
+    public static bool operator < (ConnectionGene lcg, ConnectionGene rcg)
+    {
+        return lcg.innovation < rcg.innovation;
+    }
+
+    public static bool operator >(ConnectionGene lcg, ConnectionGene rcg)
+    {
+        return lcg.innovation > rcg.innovation;
+    }
+
     public override int GetHashCode()
     {
         int h = output ^ input;
         int hl = output ^ input;
         return h;
+    }
+
+    public int CompareTo(object obj)
+    {
+        return innovation < ((ConnectionGene)obj).innovation ? -1 : 1;
     }
 }

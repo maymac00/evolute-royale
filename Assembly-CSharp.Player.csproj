@@ -66,10 +66,10 @@
     <Compile Include="Assets\Scripts\towerBehabiour.cs" />
     <Compile Include="Assets\Scripts\Utils.cs" />
     <Compile Include="Assets\Scripts\ConnectionGene.cs" />
-    <Compile Include="Assets\Scripts\God.cs" />
     <Compile Include="Assets\Scripts\unitBehabiour.cs" />
     <Compile Include="Assets\Scripts\Specie.cs" />
     <Compile Include="Assets\Scripts\Individual.cs" />
+    <Compile Include="Assets\Scripts\God.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

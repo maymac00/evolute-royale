@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class Individual
+public class Individual : IComparable
 {
     public List<int> input;
     public List<int> output;
@@ -49,11 +49,16 @@ public class Individual
     public int add_connection(int i, int o)
     {
 
-        ConnectionGene n = new ConnectionGene(i, o);
-        genome[n.innovation] = n;
-        matrix[i][o] = n;
-        NEAT.max_len = Mathf.Max(NEAT.max_len, genome.Count);
-        return n.innovation;
+        try { 
+            ConnectionGene n = new ConnectionGene(i, o);
+            genome[n.innovation] = n;
+            matrix[i][o] = n;
+            NEAT.max_len = Mathf.Max(NEAT.max_len, genome.Count);
+            return n.innovation;
+        } catch {
+            return -1;
+        }
+
     }
 
     public void add_node(int i, int o, float w)
@@ -68,6 +73,8 @@ public class Individual
         {
             l.Add(null);
         }
+        
+
         List<ConnectionGene> aux = new List<ConnectionGene>();
         for (int j = 0; j < n_neurons+1; j++)
             aux.Add(null);
@@ -125,23 +132,16 @@ public class Individual
                 int i = c[0];
                 int o = c[1];
 
-                try
+
+                if (matrix[i][o] is null)
                 {
-                    if (matrix[i][o] is null)
-                    {
-                        add_connection(i, o);
-                        break;
-                    }
-                    else
-                    {
-                        perms.Remove(c);
-                    }
+                    add_connection(i, o);
+                    break;
                 }
-                catch
+                else
                 {
                     perms.Remove(c);
                 }
-
             }
         }
 
@@ -158,7 +158,9 @@ public class Individual
             }
 
             c.enable = false;
+
             add_node(c.input, c.output, c.w);
+         
         }
     }
 
@@ -210,7 +212,7 @@ public class Individual
                 }
             }
         }
-        else
+        if (Random.Range(0, 1) < 0.5f)
         {
             if (genome.Count == 0)
             {
@@ -223,8 +225,8 @@ public class Individual
                 c = Range.choice(new List<ConnectionGene>(genome.Values));
             }
 
-            c.enable = false;
             add_node(c.input, c.output, c.w);
+            
         }
     }
 
@@ -283,53 +285,61 @@ public class Individual
 
     public float calcDistance(Individual ind)
     {
-        List<int> k1 = new List<int>(genome.Keys);
-        List<int> k2 = new List<int>(ind.genome.Keys);
-        k1.Sort();
-        k2.Sort();
-
-        int border = Mathf.Min(Utils.Max(k1), Utils.Max(k2));
-
-        HashSet<int> set1 = new HashSet<int>(k1);
-        HashSet<int> set2 = new HashSet<int>(k2);
-        HashSet<int> disjoint1 = new HashSet<int>(k1);
-        HashSet<int> disjoint2 = new HashSet<int>(k2);
-
-        disjoint1.ExceptWith(set2);
-        disjoint2.ExceptWith(set1);
-
-        disjoint1.UnionWith(disjoint2);
-
-        List<int> differ = new List<int>(disjoint1);
-
-        int disjoint = 0;
-        if (differ.Count > 0)
+        try
         {
-            int i = differ[0];
-            while (i <= border)
+            List<int> k1 = new List<int>(genome.Keys);
+            List<int> k2 = new List<int>(ind.genome.Keys);
+            k1.Sort();
+            k2.Sort();
+
+            int border = Mathf.Min(Utils.Max(k1), Utils.Max(k2));
+
+            HashSet<int> set1 = new HashSet<int>(k1);
+            HashSet<int> set2 = new HashSet<int>(k2);
+            HashSet<int> disjoint1 = new HashSet<int>(k1);
+            HashSet<int> disjoint2 = new HashSet<int>(k2);
+
+            disjoint1.ExceptWith(set2);
+            disjoint2.ExceptWith(set1);
+
+            disjoint1.UnionWith(disjoint2);
+
+            List<int> differ = new List<int>(disjoint1);
+
+            int disjoint = 0;
+            if (differ.Count > 0)
             {
-                i = differ[disjoint];
-                disjoint++;
+                int i = differ[0];
+                while (i <= border)
+                {
+                    i = differ[disjoint];
+                    disjoint++;
+                }
             }
+
+            int excess = differ.Count - disjoint;
+
+            float w_mean = 0;
+
+            set1.IntersectWith(set2);
+
+            if (set1.Count == 0)
+                return Mathf.Infinity;
+            foreach (int g in set1)
+            {
+                w_mean += Mathf.Abs(genome[g].w - ind.genome[g].w);
+            }
+            w_mean /= set1.Count;
+            int N = 15;
+            float distance = NEAT.c1 * (excess / N) + NEAT.c2 * (disjoint / N) + NEAT.c3 * w_mean;
+
+            return distance;
         }
-
-        int excess = differ.Count - disjoint;
-
-        float w_mean = 0;
-
-        set1.IntersectWith(set2);
-
-        if (set1.Count == 0)
-            return Mathf.Infinity;
-        foreach(int g in set1)
+        catch
         {
-            w_mean += Mathf.Abs(genome[g].w - ind.genome[g].w);
+            return Mathf.Infinity;
         }
-        w_mean /= set1.Count;
-        int N = 15;
-        float distance = NEAT.c1 * (excess / N) + NEAT.c2 * (disjoint / N) + NEAT.c3 * w_mean;
-
-        return distance;
+        
 
     }
 
@@ -352,5 +362,10 @@ public class Individual
         fitness = m.ally_fitness;
         specie.fitness[pos] = fitness;
 
+    }
+
+    public int CompareTo(object obj)
+    {
+        return fitness.CompareTo(((Individual)obj).fitness);
     }
 }

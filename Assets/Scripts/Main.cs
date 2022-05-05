@@ -419,7 +419,6 @@ public class Main : MonoBehaviour
         if(ally_controller == "evolutive" || enemy_controller == "evolutive")
             CancelInvoke("evolutive");   
 
-        Debug.Log("End game");
         Destroy(gameObject.transform.parent.gameObject, 1f);
         gameFinishedEvent(this);
     }

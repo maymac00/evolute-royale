@@ -1,0 +1,14 @@
+Mean: 87,14286 Adj: 65,95586 Size: 7
+27	29	233	29	27	29	236	
+Mean: 32,33333 Adj: 25,23107 Size: 3
+41	27	29	
+Mean: 26,66667 Adj: 21,72983 Size: 3
+24	29	27	
+Mean: 21,8 Adj: 13,354 Size: 5
+27	7	24	24	27	
+Mean: 20 Adj: 20 Size: 2
+29	11	
+Mean: 20 Adj: 17,46168 Size: 2
+11	29	
+Mean: 11 Adj: 11 Size: 1
+11	
