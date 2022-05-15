@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
+[Serializable]
 public class ConnectionGene : IComparable
 {
 
@@ -12,7 +13,11 @@ public class ConnectionGene : IComparable
     public float w;
     public bool enable;
     public int innovation;
-    
+
+
+    public ConnectionGene()
+    {
+    }
 
     public ConnectionGene(int _input, int _output, float _w=0.0f, bool _enable=true)
     {
@@ -55,5 +60,12 @@ public class ConnectionGene : IComparable
     public int CompareTo(object obj)
     {
         return innovation < ((ConnectionGene)obj).innovation ? -1 : 1;
+    }
+
+    public override bool Equals(object obj)
+    {
+        return obj is ConnectionGene gene &&
+               input == gene.input &&
+               output == gene.output;
     }
 }

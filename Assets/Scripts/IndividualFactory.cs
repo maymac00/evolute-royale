@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
-
+using UnityEngine.Purchasing.MiniJSON;
 
 public static class IndividualFactory
 {
@@ -55,4 +57,31 @@ public static class IndividualFactory
         }
         return ind;
     }
+
+    public static Individual buildFromFile(string path)
+    {
+        //Build genome from json file
+        string json = File.ReadAllText(path);
+
+        Dictionary<string, object> data = Json.Deserialize(json) as Dictionary<string, object>;
+
+        int input = int.Parse(data["input"].ToString());
+        int output = int.Parse(data["output"].ToString());
+
+        List<ConnectionGene> genome = new List<ConnectionGene>();
+
+        foreach (Dictionary<string, object> d in (List<object>)data["genome"])
+        {
+            ConnectionGene g = new ConnectionGene();
+            g.input = int.Parse(d["input"].ToString());
+            g.output = int.Parse(d["output"].ToString());
+            g.w = float.Parse(d["w"].ToString().Replace('.', ','));
+            g.enable = d["enable"].ToString() == "0" ? false : true;
+            g.innovation = int.Parse(d["innovation"].ToString());
+            genome.Add(g);
+        }
+
+        return buildIndividual(input, output, genome);
+    }
+
 }

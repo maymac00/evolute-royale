@@ -1,5 +1,5 @@
 sceneSetups:
-- path: Assets/Scenes/god_testing.unity
+- path: Assets/Scenes/NEAT.unity
   isLoaded: 1
   isActive: 1
   isSubScene: 0

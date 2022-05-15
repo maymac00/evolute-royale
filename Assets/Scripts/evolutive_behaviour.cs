@@ -6,17 +6,14 @@ namespace Assets.Scripts
     public class evolutive_behaviour : Brain, IBehabiour
     {
 
-        Individual ind = new Individual(12, 5);
+        public Individual ind;
 
         // Use this for initialization
         private void Start()
         {
             calcSpawn();
-            for (int i = 0; i < 20; i++)
-                ind.force_mutate();
-
         }
-        public new void act(float[] inputs = null)
+        public int act(float[] inputs = null)
         {
             float[] output = ind.process(inputs);
 
@@ -25,19 +22,47 @@ namespace Assets.Scripts
             switch (action)
             {
                 case 0:
-                    break;
+                    ind.log += "_";
+                    return 0;
                 case 1:
-                    spawnSquare();
-                    break;
+                    bool b = spawnSquare();
+                    ind.log += "s";
+                    if (!b)
+                        return 1;
+                    else
+                        return 0;
                 case 2:
-                    spawnDiamond();
-                    break;
+                    b = spawnDiamond();
+                    ind.log += "d";
+                    if (!b)
+                        return 1;
+                    else
+                        return 0;
                 case 3:
-                    spawnTriangle();
-                    break;
+                    b = spawnTriangle();
+                    ind.log += "t";
+                    if (!b)
+                        return 1;
+                    else
+                        return 0;
                 case 4:
-                    spawnPentagon();
+                    b = spawnPentagon();
+                    ind.log += "p";
+                    if (!b)
+                        return 1;
+                    else
+                        return 0;
                     break;
+                case 5:
+                    b = explode();
+                    ind.log += "e";
+                    if (!b)
+                        return 1;
+                    else
+                        return 0;
+
+                default:
+                    return 0;
             }
         }
 

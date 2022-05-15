@@ -9,35 +9,33 @@ public static class NEAT
 {
     public static float game_speed = 1.0f;
 
-    public static int dropoff = 15;
-    public static int blood_rate = 3;
-    public static double max_reward = 500.0;
-    //public static float new_node_mutation_rate = 0.03f;
-    public static float new_node_mutation_rate = 0.3f;
-    //public static float new_link_mutation_rate = 0.05f;
-    public static float new_link_mutation_rate = 0.2f;
+    public static float new_node_mutation_rate = 0.03f;
+    //public static float new_node_mutation_rate = 0.3f;
+    public static float new_link_mutation_rate = 0.05f;
+    //public static float new_link_mutation_rate = 0.2f;
     public static float weight_mutation_rate = 0.9f;
     public static int n_innovations = 1;
     public static Dictionary<ConnectionGene, int> innovations = new Dictionary<ConnectionGene, int>();
     public static int[] innovations_arr = new int[2048];
 
-
+    public static int dropoff = 3;
     public static int max_len = 0;
     public static float step = 2.5f;
-    public static int species_pool_size = 15;
-    public static int reps = 1;
-    public static string opt = "max";
+    public static int species_pool_size = 3;
+    public static float bloodrate = 1.0f;
+    public static float survival_threshold = 0.334f;
 
-    public static float distance_thld = 4.0f;
-    public static float c1 = 1.0f; // Disjoint
-    public static float c2 = 1.0f; // Excess
-    public static float c3 = 0.3f; // Weight
+    public static float distance_thld = 6.0f;
+    public static float c1 = 2.0f; // Disjoint
+    public static float c2 = 2.0f; // Excess
+    public static float c3 = 1.0f; // Weight
 
-    public const int N_INPUTS = 15;
-    public const int N_OUTPUTS = 4;
+    public const int N_INPUTS = 12;
+    public const int N_OUTPUTS = 6;
 
-    public static string activation_function = "";
-    public static string inner_activation_function = "";
+    public static string activation_function = "relu";
+    public static string inner_activation_function = "relu";
+    
 
     public static void check_innovation(ConnectionGene connectionGene)
     {
@@ -63,6 +61,7 @@ public static class NEAT
                 return Mathf.Max(0, x);
             case "sigmoid_mod":
                 return (4 / (1+Mathf.Pow((float)Math.E, -x))) - 2;
+
             default:
                 return (1 / (1 + Mathf.Pow((float)Math.E, -x)));
         }
@@ -107,8 +106,11 @@ public static class NEAT
                 genome3.Add(connectionGene);
             }
         }
-        
-        return IndividualFactory.buildIndividual(ind1.input.Count, ind1.output.Count, genome3);
+        Individual child = IndividualFactory.buildIndividual(ind1.input.Count, ind1.output.Count, genome3);
+        child.parents.Add(ind1);
+        child.parents.Add(ind2);
+        child.specie = ind1.specie;
+        return child;
     }
 
 }

@@ -65,7 +65,7 @@ public static class Utils
         int res = l[0];
         foreach(int it in l)
         {
-            if(res > it)
+            if(it > res)
             {
                 res = it;
             }
@@ -78,7 +78,7 @@ public static class Utils
         float res = l[0];
         foreach (float it in l)
         {
-            if (res > it)
+            if (it > res)
             {
                 res = it;
             }
@@ -91,7 +91,7 @@ public static class Utils
         int res = l[0];
         foreach (int it in l)
         {
-            if (res < it)
+            if (it < res)
             {
                 res = it;
             }
@@ -104,7 +104,7 @@ public static class Utils
         float res = l[0];
         foreach (float it in l)
         {
-            if (res < it)
+            if (it < res)
             {
                 res = it;
             }
@@ -116,7 +116,7 @@ public static class Utils
     {
         int res = 0;
         for (int i = 1; i < l.Length; i++) {
-            if (l[res] < l[i])
+            if (l[i] < l[res])
             {
                 res = i;
             }
@@ -129,7 +129,7 @@ public static class Utils
         int res = 0;
         for (int i = 1; i < l.Length; i++)
         {
-            if (l[res] > l[i])
+            if (l[i] > l[res])
             {
                 res = i;
             }

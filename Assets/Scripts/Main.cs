@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using Assets.Scripts;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using Assets.Scripts;
+using Object = UnityEngine.Object;
 
 public abstract class Brain : MonoBehaviour
 {
@@ -122,10 +124,11 @@ public abstract class Brain : MonoBehaviour
     }
     protected bool explode() {
         if (gold >= 7) {
-            Transform[] children = transform.parent.GetComponentsInChildren<Transform>();
-            for (int i = 11; i < children.Length; i++) {
-                Debug.Log("");
+            unitBehabiour[] children = transform.parent.GetComponentsInChildren<unitBehabiour>();
+            for (int i = 0; i < children.Length; i++) {
+                children[i].explode();
             }
+            target.GetComponent<towerBehabiour>().dealDamage(5);
             return true;
         }
         return false;
@@ -145,7 +148,7 @@ public abstract class Brain : MonoBehaviour
 
 interface IBehabiour
 {
-    void act(float[] inputs = null);
+    int act(float[] inputs = null);
 
 }
 
@@ -165,6 +168,11 @@ public class Main : MonoBehaviour
 
     public int ally_fitness;
     public int enemy_fitness;
+
+    public int ally_violations = 0;
+    public int enemy_violations = 0;
+
+    public int speed;
 
 
     public int timer = 0;
@@ -215,6 +223,7 @@ public class Main : MonoBehaviour
                 brain_ally = new GameObject("allyBrain");
                 brain_ally.transform.SetParent(gameObject.transform.parent);
                 evolutive_behaviour src_ev = brain_ally.AddComponent<evolutive_behaviour>();
+                src_ev.ind = ally_ind;
                 src_ev.target = gameObject.transform.parent.transform.GetChild(1).gameObject;
                 src_ev.myTower = gameObject.transform.parent.transform.GetChild(0).gameObject;
                 src_ev.prefabSquare = (GameObject)Resources.Load("Prefabs/Square", typeof(GameObject));
@@ -226,16 +235,19 @@ public class Main : MonoBehaviour
                 break;
 
             default:
+                Enviroment.speed = this.speed;
                 brain_ally = new GameObject("allyBrain");
                 brain_ally.transform.SetParent(gameObject.transform.parent);
-                controlled_behaviour src = brain_ally.AddComponent<controlled_behaviour>();
-                src.target = gameObject.transform.parent.transform.GetChild(1).gameObject;
-                src.myTower = gameObject.transform.parent.transform.GetChild(0).gameObject;
-                src.prefabSquare = (GameObject)Resources.Load("Prefabs/Square", typeof(GameObject));
-                src.prefabTriangle = (GameObject)Resources.Load("Prefabs/Triangle", typeof(GameObject));
-                src.prefabPentagon = (GameObject)Resources.Load("Prefabs/Pentagon", typeof(GameObject));
-                src.prefabDiamond = (GameObject)Resources.Load("Prefabs/Diamond", typeof(GameObject));
-                src.direction = 1;
+                src_ev = brain_ally.AddComponent<evolutive_behaviour>();
+                src_ev.ind = new Individual(12, 5);
+                src_ev.target = gameObject.transform.parent.transform.GetChild(1).gameObject;
+                src_ev.myTower = gameObject.transform.parent.transform.GetChild(0).gameObject;
+                src_ev.prefabSquare = (GameObject)Resources.Load("Prefabs/Square", typeof(GameObject));
+                src_ev.prefabTriangle = (GameObject)Resources.Load("Prefabs/Triangle", typeof(GameObject));
+                src_ev.prefabPentagon = (GameObject)Resources.Load("Prefabs/Pentagon", typeof(GameObject));
+                src_ev.prefabDiamond = (GameObject)Resources.Load("Prefabs/Diamond", typeof(GameObject));
+                src_ev.direction = 1;
+                InvokeRepeating("evolutive", 1, (float)(1 / NEAT.game_speed));                
                 break;
         }
 
@@ -272,6 +284,7 @@ public class Main : MonoBehaviour
                 brain_enemy = new GameObject("enemyBrain");
                 brain_enemy.transform.SetParent(gameObject.transform.parent);
                 evolutive_behaviour src_ev = brain_enemy.AddComponent<evolutive_behaviour>();
+                src_ev.ind = enemy_ind;                
                 src_ev.target = gameObject.transform.parent.transform.GetChild(0).gameObject;
                 src_ev.myTower = gameObject.transform.parent.transform.GetChild(1).gameObject;
                 src_ev.prefabSquare = (GameObject)Resources.Load("Prefabs/Square", typeof(GameObject));
@@ -279,31 +292,30 @@ public class Main : MonoBehaviour
                 src_ev.prefabPentagon = (GameObject)Resources.Load("Prefabs/Pentagon", typeof(GameObject));
                 src_ev.prefabDiamond = (GameObject)Resources.Load("Prefabs/Diamond", typeof(GameObject));
                 src_ev.direction = -1;
-                if(ally_controller != "evolutive")
+                if (ally_controller != "evolutive")
                     InvokeRepeating("evolutive", 1, (float)(1 / NEAT.game_speed));
                 break;
 
             default:
+                Enviroment.speed = this.speed;
                 brain_enemy = new GameObject("enemyBrain");
                 brain_enemy.transform.SetParent(gameObject.transform.parent);
-                coded_behaviour src = brain_enemy.AddComponent<coded_behaviour>();
-                src.target = gameObject.transform.parent.transform.GetChild(0).gameObject;
-                src.myTower = gameObject.transform.parent.transform.GetChild(1).gameObject;
-                src.prefabSquare = (GameObject)Resources.Load("Prefabs/Square", typeof(GameObject));
-                src.prefabTriangle = (GameObject)Resources.Load("Prefabs/Triangle", typeof(GameObject));
-                src.prefabPentagon = (GameObject)Resources.Load("Prefabs/Pentagon", typeof(GameObject));
-                src.prefabDiamond = (GameObject)Resources.Load("Prefabs/Diamond", typeof(GameObject));
-                src.direction = -1;
+                src_ev = brain_enemy.AddComponent<evolutive_behaviour>();
+                src_ev.ind = IndividualFactory.buildFromFile("Champions/"+ enemy_controller);
+                src_ev.target = gameObject.transform.parent.transform.GetChild(0).gameObject;
+                src_ev.myTower = gameObject.transform.parent.transform.GetChild(1).gameObject;
+                src_ev.prefabSquare = (GameObject)Resources.Load("Prefabs/Square", typeof(GameObject));
+                src_ev.prefabTriangle = (GameObject)Resources.Load("Prefabs/Triangle", typeof(GameObject));
+                src_ev.prefabPentagon = (GameObject)Resources.Load("Prefabs/Pentagon", typeof(GameObject));
+                src_ev.prefabDiamond = (GameObject)Resources.Load("Prefabs/Diamond", typeof(GameObject));
+                src_ev.direction = -1;
+                if (ally_controller != "evolutive")
+                    InvokeRepeating("evolutive", 1, (float)(1 / NEAT.game_speed));
                 break;
         }
         brain_ally.GetComponent<Brain>().position = position;
         brain_enemy.GetComponent<Brain>().position = position;
         InvokeRepeating("secondUpdate", 1, (float)(1 / NEAT.game_speed));
-    }
-
-    void Update()
-    {
-
     }
 
     void secondUpdate()
@@ -312,7 +324,7 @@ public class Main : MonoBehaviour
         {
             towerBehabiour ta = gameObject.transform.parent.transform.GetChild(0).gameObject.GetComponent<towerBehabiour>();
             towerBehabiour te = gameObject.transform.parent.transform.GetChild(1).gameObject.GetComponent<towerBehabiour>();
-            int diff = ta.health - te.health;
+            int diff = (ta.health - te.health);
             endGame(diff);
         }
 
@@ -324,9 +336,7 @@ public class Main : MonoBehaviour
         gameObject.transform.parent.transform.GetChild(4).GetComponent<TextMesh>().text = ally.gold.ToString();
         gameObject.transform.parent.transform.GetChild(5).GetComponent<TextMesh>().text = enemy.gold.ToString();
         gameObject.GetComponent<TextMesh>().text = "Timer: " + timer.ToString() + " s";
-
-        ally.log += "_";
-        enemy.log += "_";
+        
     }
 
     void evolutive()
@@ -380,6 +390,26 @@ public class Main : MonoBehaviour
             enemy_input[11] = Utils.normalize(enemy_input[11], 0, 100);
         }
 
+        if (timer > 15) {
+            if(ally_input[0] == 1 && enemy_input[0] == 1)
+            {
+                List<int> r = ally_ind.log
+                .GroupBy(c => c)
+                .Select(group => group.Count())
+                .ToList();
+
+                List<int> l = enemy_ind.log
+                .GroupBy(c => c)
+                .Select(group => group.Count())
+                .ToList();
+
+                if(r.Count == l.Count)
+                {
+                    endGame(0);
+                }
+            }
+        }
+
         evolutive_behaviour a = null;
         evolutive_behaviour e = null;
         try {
@@ -393,33 +423,80 @@ public class Main : MonoBehaviour
 
         if (a != null)
         {
-            a.act(enemy_input);
+            ally_violations += a.act(enemy_input);
         }
         if (e != null)
         {
-            e.act(enemy_input);
+            enemy_violations += e.act(enemy_input);
         }
 
     }
-
-    public delegate void gameFinishedDelegate(Main p);
-    public event gameFinishedDelegate gameFinishedEvent;
     
     public void endGame(int diff)
     {
-        //Finish game, set winner etc...
-        winner = diff >= 0 ? 1 : 0;
         this.diff = diff;
 
-        ally_fitness = (int)Utils.Max(diff + 150 - timer * 0.5f, 0.0f);
-        enemy_fitness = (int)Utils.Max(diff*-1 + 150 - timer * 0.5f, 0.0f);
+        winner = diff > 0 ? -1 : 1;  // -1 = ally, 1 = enemy
+        winner = diff == 0 ? 0 : winner;
+        
+        int penalty(int x)
+        {
+            float var = (400 / (1 + Mathf.Pow((float)Math.E, -(1.0f / (25.0f - (float)Generation.n_gen)) * (float)x))) - 200;
+            return (int)var;
+        }
+        
+        if (!Tournament.playing)
+        {
+            // Generation games
+            // Dynamic penalty
+            ally_ind.violations = ally_violations;
+            enemy_ind.violations = enemy_violations;
+            if (winner == -1)
+            {
+                // Ally wins
+                ally_ind.wins += 1;
+                int rwd = (int)(200 - penalty(ally_violations));
+                ally_ind.fitness += Math.Max(rwd, 0);
+            }
+            else if (winner == 1)
+            {
+                // Enemy wins
+                enemy_ind.wins += 1;
+                int rwd = (int)(200 - penalty(enemy_violations));
+                enemy_ind.fitness += Math.Max(rwd, 0);
+            }
+            else
+            {
+                // Tie
+                ally_ind.fitness += Math.Max(50 - penalty(ally_violations), 0);
+                enemy_ind.fitness += Math.Max(50 - penalty(ally_violations), 0);
+            }
+            
+            Individual.gen.games_played++;
+        }
+        else
+        {
+            // Tournament games  
+            if (ally_ind.specie != null)
+                ally_ind.specie.tournament_wins += diff <= 0 ? 0 : 1;
+            if (enemy_ind.specie != null)
+                enemy_ind.specie.tournament_wins += diff >= 0 ? 0 : 1;
 
+
+            Individual.tour.games_played++;
+        }
+        
+        if (Tournament.playing)
+            Individual.tour.games_played++;
+        else
+            Individual.gen.games_played++;
 
         CancelInvoke("secondUpdate");
         if(ally_controller == "evolutive" || enemy_controller == "evolutive")
-            CancelInvoke("evolutive");   
+            CancelInvoke("evolutive");
 
+        Enviroment.arena[coords[0], coords[1]] = 0;
+        //gameFinishedEvent(this);
         Destroy(gameObject.transform.parent.gameObject, 1f);
-        gameFinishedEvent(this);
     }
 }

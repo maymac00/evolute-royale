@@ -4,7 +4,7 @@ using UnityEngine;
 
 interface IUnit
 {
-    void dealDamage(int p);
+    public void dealDamage(int p);
     string getHealth();
 }
 public class unitBehabiour : MonoBehaviour, IUnit
@@ -17,7 +17,7 @@ public class unitBehabiour : MonoBehaviour, IUnit
 
     //STATS
     public int health;
-    public int MoveSpeed;
+    public float MoveSpeed;
     public float range;
     public int power;
     public float attSpeed;
@@ -87,7 +87,19 @@ public class unitBehabiour : MonoBehaviour, IUnit
         }
         
     }
+    public void explode()
+    {
+        health -= 35;
+        try
+        {
+            healthBar lifes = this.gameObject.transform.GetComponentInChildren<healthBar>();
+            lifes.update();
+        }
+        catch
+        {
 
+        }
+    }
     public string getHealth()
     {
         return health.ToString();

@@ -38,8 +38,8 @@ public class controlled_behaviour : Brain, IBehabiour
         act();
     }
     
-
-    public void act(float[] inputs = null)
+    
+    public int act(float[] inputs = null)
     {
         if (Input.GetKeyUp(squ))
         {
@@ -60,6 +60,6 @@ public class controlled_behaviour : Brain, IBehabiour
         else if (Input.GetKeyUp(exp)) {
             explode();
         }
-
+        return 0;
     }
 }

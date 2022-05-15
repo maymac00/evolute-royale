@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class Individual : IComparable
+public class Individual : IComparable, ICloneable
 {
     public List<int> input;
     public List<int> output;
     public List<int> hidden;
 
-    public static God god;
+    public static Generation gen;
+    public static Tournament tour;
 
     public Specie specie;
 
@@ -21,8 +23,16 @@ public class Individual : IComparable
     public Dictionary<int, ConnectionGene> genome;
 
     public float adj_fitness = -1.0f;
-    public float fitness = -1.0f;
+    public float fitness = 0f;
+    public int violations = 0;
+    public int wins = 0;
+    
+    
     public int pos;
+    public string name;
+
+    public string log = "";
+    public List<Individual> parents = new List<Individual>();
 
     public Individual(int inp = -1, int _output = -1)
     {
@@ -44,18 +54,23 @@ public class Individual : IComparable
 
         genome = new Dictionary<int, ConnectionGene>();
 
+        name = God.getName();
+
     }
 
     public int add_connection(int i, int o)
     {
 
-        try { 
+        try
+        {
             ConnectionGene n = new ConnectionGene(i, o);
             genome[n.innovation] = n;
             matrix[i][o] = n;
             NEAT.max_len = Mathf.Max(NEAT.max_len, genome.Count);
             return n.innovation;
-        } catch {
+        }
+        catch
+        {
             return -1;
         }
 
@@ -73,10 +88,10 @@ public class Individual : IComparable
         {
             l.Add(null);
         }
-        
+
 
         List<ConnectionGene> aux = new List<ConnectionGene>();
-        for (int j = 0; j < n_neurons+1; j++)
+        for (int j = 0; j < n_neurons + 1; j++)
             aux.Add(null);
 
         matrix.Add(aux);
@@ -89,11 +104,11 @@ public class Individual : IComparable
         hidden.Add(n_neurons);
 
         n_neurons++;
-        
+
 
         NEAT.max_len = Mathf.Max(NEAT.max_len, genome.Count);
 
-        
+
     }
 
     public void mutate()
@@ -104,7 +119,12 @@ public class Individual : IComparable
             {
                 if (Random.Range(0, 1) < NEAT.weight_mutation_rate)
                 {
-                    gen.w = gen.w + NEAT.step * 2 * (Random.Range(-1, 1));
+                    float jump = Random.Range(-1.0f, 1.0f);
+                    gen.w = gen.w + NEAT.step * jump;
+                    if (gen.w > 4.0f)
+                        gen.w = 4.0f;
+                    if (gen.w < -4.0f)
+                        gen.w = -4.0f;
                 }
             }
         }
@@ -112,22 +132,23 @@ public class Individual : IComparable
         if (Random.Range(0, 1) < NEAT.new_link_mutation_rate)
         {
             List<List<int>> perms = new List<List<int>>();
-            
+
             List<int> outs = new List<int>(output);
             outs.AddRange(hidden);
             List<int> ins = new List<int>(input);
             ins.AddRange(hidden);
-            
+
             foreach (int i in ins)
             {
                 foreach (int o in outs)
                 {
-                    if(i != o)
-                        perms.Add(new List<int>() {i, o});
+                    if (i != o)
+                        perms.Add(new List<int>() { i, o });
                 }
             }
 
-            while (perms.Count != 0) {
+            while (perms.Count != 0)
+            {
                 List<int> c = Range.choice(perms);
                 int i = c[0];
                 int o = c[1];
@@ -153,14 +174,15 @@ public class Individual : IComparable
             }
 
             ConnectionGene c = Range.choice(new List<ConnectionGene>(genome.Values));
-            while (!c.enable) {
+            while (!c.enable)
+            {
                 c = Range.choice(new List<ConnectionGene>(genome.Values));
             }
 
             c.enable = false;
 
             add_node(c.input, c.output, c.w);
-         
+
         }
     }
 
@@ -172,7 +194,11 @@ public class Individual : IComparable
             {
                 if (Random.Range(0, 1) < NEAT.weight_mutation_rate)
                 {
-                    gen.w = gen.w + NEAT.step * 2 * (Random.Range(-1, 1));
+                    gen.w = gen.w + NEAT.step * (Random.Range(-1, 1));
+                    if (gen.w > 4.0f)
+                        gen.w = 4.0f;
+                    if (gen.w < -4.0f)
+                        gen.w = -4.0f;
                 }
             }
         }
@@ -226,19 +252,19 @@ public class Individual : IComparable
             }
 
             add_node(c.input, c.output, c.w);
-            
+
         }
     }
 
     public float[] process(float[] inputs)
     {
-        if(inputs.Length != input.Count)
+        if (inputs.Length != input.Count)
         {
             throw new NotImplementedException();
         }
 
         Dictionary<int, float> results = new Dictionary<int, float>();
-        
+
         for (int j = 0; j < inputs.Length; j++)
         {
             results[j] = inputs[j];
@@ -253,7 +279,7 @@ public class Individual : IComparable
         }
         return res;
     }
-    private float backrec(int neuron, Dictionary<int,float> results, List<int> visited)
+    private float backrec(int neuron, Dictionary<int, float> results, List<int> visited)
     {
         if (results.ContainsKey(neuron))
         {
@@ -269,13 +295,14 @@ public class Individual : IComparable
         for (int i = 0; i < n_neurons; i++)
         {
             ConnectionGene entry = matrix[i][neuron];
-            if(!(entry is null))
+            if (!(entry is null))
             {
-                if (entry.enable) {
+                if (entry.enable)
+                {
                     visited.Add(neuron);
                     res += backrec(i, results, visited) * entry.w;
                     visited.Remove(neuron);
-                }     
+                }
             }
         }
         results[neuron] = NEAT.f_inner_activation_function(res);
@@ -283,12 +310,12 @@ public class Individual : IComparable
 
     }
 
-    public float calcDistance(Individual ind)
+    public float calcDistance(Dictionary<int, ConnectionGene> adn)
     {
         try
         {
             List<int> k1 = new List<int>(genome.Keys);
-            List<int> k2 = new List<int>(ind.genome.Keys);
+            List<int> k2 = new List<int>(adn.Keys);
             k1.Sort();
             k2.Sort();
 
@@ -305,19 +332,22 @@ public class Individual : IComparable
             disjoint1.UnionWith(disjoint2);
 
             List<int> differ = new List<int>(disjoint1);
+            differ.Sort();
 
-            int disjoint = 0;
+            float disjoint = 0;
             if (differ.Count > 0)
             {
-                int i = differ[0];
-                while (i <= border)
+                int aux = differ[0];
+                int i = 0;
+                while (aux < border)
                 {
-                    i = differ[disjoint];
+                    aux = differ[i];
                     disjoint++;
+                    i++;
                 }
             }
 
-            int excess = differ.Count - disjoint;
+            float excess = differ.Count - disjoint;
 
             float w_mean = 0;
 
@@ -327,10 +357,10 @@ public class Individual : IComparable
                 return Mathf.Infinity;
             foreach (int g in set1)
             {
-                w_mean += Mathf.Abs(genome[g].w - ind.genome[g].w);
+                w_mean += Mathf.Abs(genome[g].w - adn[g].w);
             }
             w_mean /= set1.Count;
-            int N = 15;
+            float N = Utils.Max(genome.Count, adn.Count);
             float distance = NEAT.c1 * (excess / N) + NEAT.c2 * (disjoint / N) + NEAT.c3 * w_mean;
 
             return distance;
@@ -339,33 +369,78 @@ public class Individual : IComparable
         {
             return Mathf.Infinity;
         }
-        
+
 
     }
 
     public void score()
     {
-        Arena a = god.getArena();
+        Arena a = Enviroment.getArena();
         while (a is null)
         {
             WaitForSeconds w = new WaitForSeconds(1.0f);
-            a = god.getArena();
+            a = Enviroment.getArena();
         }
         int i = a.coords[0];
         int j = a.coords[1];
-        god.spawn_game(this, i, j);
+        God.spawn_game(this, i, j);
 
     }
-    public void notifyWin(Main m)
+
+    public IEnumerator fight(Individual enemy)
     {
-        god.arena[m.coords[0], m.coords[1]] = 0;
-        fitness = m.ally_fitness;
-        specie.fitness[pos] = fitness;
+        Arena a = Enviroment.getArena();
+        while (a is null)
+        {
+            WaitForSeconds w = new WaitForSeconds(1.0f);
+            yield return w;
+            a = Enviroment.getArena();
+        }
+        int i = a.coords[0];
+        int j = a.coords[1];
+        God.spawn_game(this, enemy, a.pos, i, j);
+
+        yield return null;
 
     }
 
     public int CompareTo(object obj)
     {
-        return fitness.CompareTo(((Individual)obj).fitness);
+        int r = fitness.CompareTo(((Individual)obj).fitness);
+        return r*-1;
+    }
+
+    public object Clone()
+    {
+        return IndividualFactory.buildIndividual(input.Count, output.Count, new List<ConnectionGene>(genome.Values));
+    }
+
+    public void save(string path)
+    {
+        //Save the genome as json
+        string json = "{";
+        json += "\"log\":" + log + ",";
+        json += "\"input\":" + input.Count + ",";
+        json += "\"output\":" + output.Count + ",";
+
+        json += "\"genome\":[";
+        bool first = true;
+        foreach (ConnectionGene c in genome.Values)
+        {
+            if (!first)
+                json += ",";
+            first = false;
+            json += "{";
+            json += "\"input\":" + c.input + ",";
+            json += "\"output\":" + c.output + ",";
+            json += "\"w\":" + c.w.ToString().Replace(',', '.') + ",";
+            json += "\"enable\":" + (c.enable ? 1:0)+ ",";
+            json += "\"innovation\":" + c.innovation;
+            json += "}";
+        }
+        json += "]";
+        json += "}";
+
+        File.WriteAllText("Champions/"+path, json);
     }
 }
