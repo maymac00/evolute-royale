@@ -121,10 +121,6 @@ public class Individual : IComparable, ICloneable
                 {
                     float jump = Random.Range(-1.0f, 1.0f);
                     gen.w = gen.w + NEAT.step * jump;
-                    if (gen.w > 4.0f)
-                        gen.w = 4.0f;
-                    if (gen.w < -4.0f)
-                        gen.w = -4.0f;
                 }
             }
         }
@@ -404,6 +400,23 @@ public class Individual : IComparable, ICloneable
 
     }
 
+    public IEnumerator fight()
+    {
+        Arena a = Enviroment.getArena();
+        while (a is null)
+        {
+            WaitForSeconds w = new WaitForSeconds(1.0f);
+            yield return w;
+            a = Enviroment.getArena();
+        }
+        int i = a.coords[0];
+        int j = a.coords[1];
+        God.spawn_game(this, i, j);
+
+        yield return null;
+
+    }
+
     public int CompareTo(object obj)
     {
         int r = fitness.CompareTo(((Individual)obj).fitness);
@@ -420,6 +433,8 @@ public class Individual : IComparable, ICloneable
         //Save the genome as json
         string json = "{";
         json += "\"log\":" + log + ",";
+        json += "\"violations\":" + violations + ",";
+        json += "\"wins\":" + specie.tournament_wins + ",";
         json += "\"input\":" + input.Count + ",";
         json += "\"output\":" + output.Count + ",";
 

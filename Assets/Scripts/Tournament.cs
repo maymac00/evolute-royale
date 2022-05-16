@@ -17,15 +17,15 @@ public class Tournament : MonoBehaviour
     void Start()
     {
         Individual.tour = this;
-        //Play all other champions
-        //TODO: play vs hardcoded behaviour
+        //Play all other 
         participants.AddRange(host_champions);
         participants.AddRange(parasite_champions);
 
+        List<Individual> hall = new List<Individual>();
         if (hall_of_fame.Count > 0) {
             for (int i = 0; i < Mathf.Min(hall_of_fame.Count, 8); i++)
             {
-                participants.Add(Range.choice(hall_of_fame));
+                hall.Add(Range.choice(hall_of_fame));
             }
         }
 
@@ -38,7 +38,20 @@ public class Tournament : MonoBehaviour
             }
         }
 
+        foreach(Individual p in participants)
+        {
+            foreach (Individual h in hall)
+            {
+                StartCoroutine(p.fight(h));
+            }
+            StartCoroutine(p.fight());
+        }
+        
+        
+
         target_games = ((participants.Count - 1) * participants.Count / 2);
+        target_games += hall.Count*participants.Count; // vs hall
+        target_games += participants.Count; // vs coded
     }
 
     // Update is called once per frame

@@ -128,7 +128,7 @@ public abstract class Brain : MonoBehaviour
             for (int i = 0; i < children.Length; i++) {
                 children[i].explode();
             }
-            target.GetComponent<towerBehabiour>().dealDamage(5);
+            gold -= 7;
             return true;
         }
         return false;
@@ -397,11 +397,14 @@ public class Main : MonoBehaviour
                 .GroupBy(c => c)
                 .Select(group => group.Count())
                 .ToList();
-
-                List<int> l = enemy_ind.log
-                .GroupBy(c => c)
-                .Select(group => group.Count())
-                .ToList();
+                List<int> l = new List<int>();
+                if (enemy_controller == "evolutive") {
+                    l = enemy_ind.log
+                    .GroupBy(c => c)
+                    .Select(group => group.Count())
+                    .ToList();
+                }
+                
 
                 if(r.Count == l.Count)
                 {
@@ -423,7 +426,7 @@ public class Main : MonoBehaviour
 
         if (a != null)
         {
-            ally_violations += a.act(enemy_input);
+            ally_violations += a.act(ally_input);
         }
         if (e != null)
         {
@@ -441,7 +444,15 @@ public class Main : MonoBehaviour
         
         int penalty(int x)
         {
-            float var = (400 / (1 + Mathf.Pow((float)Math.E, -(1.0f / (25.0f - (float)Generation.n_gen)) * (float)x))) - 200;
+            float var;
+            if (Generation.n_gen < 25.0f)
+            {
+                var = (400 / (1 + Mathf.Pow((float)Math.E, -(1.0f / (25.0f - (float)Generation.n_gen)) * (float)x))) - 200;
+            }
+            else
+            {
+                var = 5 * x;
+            }
             return (int)var;
         }
         
@@ -450,26 +461,53 @@ public class Main : MonoBehaviour
             // Generation games
             // Dynamic penalty
             ally_ind.violations = ally_violations;
-            enemy_ind.violations = enemy_violations;
+            
             if (winner == -1)
             {
                 // Ally wins
+                List<int> r = ally_ind.log
+                .GroupBy(c => c)
+                .Select(group => group.Count())
+                .ToList();
                 ally_ind.wins += 1;
-                int rwd = (int)(200 - penalty(ally_violations));
+                int rwd = (int)(200 - penalty(ally_violations) + 10 * (r.Count > 2 ? r.Count : 0));
                 ally_ind.fitness += Math.Max(rwd, 0);
             }
             else if (winner == 1)
             {
-                // Enemy wins
-                enemy_ind.wins += 1;
-                int rwd = (int)(200 - penalty(enemy_violations));
-                enemy_ind.fitness += Math.Max(rwd, 0);
+                if (enemy_controller == "evolutive")
+                {
+                    // Enemy wins
+                    List<int> r = enemy_ind.log
+                    .GroupBy(c => c)
+                    .Select(group => group.Count())
+                    .ToList();
+                    enemy_ind.wins += 1;
+                    enemy_ind.violations = enemy_violations;
+                    int rwd = (int)(200 - penalty(enemy_violations) + 10 * (r.Count > 2 ? r.Count : 0));
+                    enemy_ind.fitness += Math.Max(rwd, 0);
+                }
+                   
             }
             else
             {
                 // Tie
-                ally_ind.fitness += Math.Max(50 - penalty(ally_violations), 0);
-                enemy_ind.fitness += Math.Max(50 - penalty(ally_violations), 0);
+
+                List<int> r = ally_ind.log
+                .GroupBy(c => c)
+                .Select(group => group.Count())
+                .ToList();
+                ally_ind.fitness += Math.Max(50 - penalty(ally_violations) + 20 * (r.Count > 2 ? r.Count:0), 0) ;
+                if (enemy_controller == "evolutive")
+                {
+                    r = enemy_ind.log
+                    .GroupBy(c => c)
+                    .Select(group => group.Count())
+                    .ToList();
+                    enemy_ind.violations = enemy_violations;
+                    enemy_ind.fitness += Math.Max(50 - penalty(ally_violations) + 20 * (r.Count > 2 ? r.Count : 0), 0);
+                }
+                    
             }
             
             Individual.gen.games_played++;
@@ -477,11 +515,57 @@ public class Main : MonoBehaviour
         else
         {
             // Tournament games  
-            if (ally_ind.specie != null)
-                ally_ind.specie.tournament_wins += diff <= 0 ? 0 : 1;
-            if (enemy_ind.specie != null)
-                enemy_ind.specie.tournament_wins += diff >= 0 ? 0 : 1;
 
+            if (winner == -1)
+            {
+                if (ally_ind.specie != null)
+                {
+                    List<int> r = ally_ind.log
+                    .GroupBy(c => c)
+                    .Select(group => group.Count())
+                    .ToList();
+                    // Ally wins
+                    ally_ind.violations = ally_violations;
+                    int rwd = (int)(200 - penalty(ally_violations) + 10 * (r.Count > 2 ? r.Count : 0));
+                    ally_ind.specie.tournament_wins += Math.Max(rwd, 0);
+                }
+            }
+            else if (winner == 1)
+            {
+                if (enemy_controller == "evolutive") {
+                    if (enemy_ind.specie != null)
+                    {
+                        List<int> r = enemy_ind.log
+                        .GroupBy(c => c)
+                        .Select(group => group.Count())
+                        .ToList();
+                        // Enemy wins
+                        enemy_ind.violations = enemy_violations;
+                        int rwd = (int)(200 - penalty(enemy_violations) + 10 * (r.Count > 2 ? r.Count : 0));
+                        enemy_ind.specie.tournament_wins += Math.Max(rwd, 0);
+                    } 
+                }
+            }
+            else
+            {
+                // Tie
+                List<int> r = ally_ind.log
+                   .GroupBy(c => c)
+                   .Select(group => group.Count())
+                   .ToList();
+                if (ally_ind.specie != null)
+                    ally_ind.specie.tournament_wins += Math.Max(50 - penalty(ally_violations) + 10 * (r.Count > 2 ? r.Count : 0), 0);
+
+                if (enemy_controller == "evolutive")
+                {
+                    r = enemy_ind.log
+                    .GroupBy(c => c)
+                    .Select(group => group.Count())
+                    .ToList();
+                    if (enemy_ind.specie != null)
+                        enemy_ind.specie.tournament_wins += Math.Max(50 - penalty(ally_violations) + 20 * (r.Count > 2 ? r.Count : 0), 0);
+                }
+            }
 
             Individual.tour.games_played++;
         }

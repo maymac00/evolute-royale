@@ -5,17 +5,17 @@ using UnityEngine;
 public static class Enviroment
 {
     
-    static public int grid_size = 8;
+    static public int grid_size = 14;
     static public int grid_x = 0;
     static public int grid_y = 0;
 
-    static public int speed = 5;
-    static readonly public int N_INDS = 30;
+    static public int speed = 10;
+    static readonly public int N_INDS = 40;
 
     static public Vector3[,] grid = new Vector3[grid_size, grid_size];
     static public byte[,] arena = new byte[grid_size, grid_size];
 
-    static public int n_gens = 50;
+    static public int n_gens = 100;
 
     static public Arena getArena()
     {
@@ -93,6 +93,8 @@ public class God : MonoBehaviour
     }
     public static string getName()
     {
+        if (names == null)
+            return "Testing";
         return names[Random.Range(0, names.Length)];
     }
     void Start()

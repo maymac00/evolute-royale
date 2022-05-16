@@ -56,7 +56,10 @@ public class Specie
                 games_played++;
                 mymonoB.StartCoroutine(individuals[i].fight(individuals[j]));
             }
+
+            mymonoB.StartCoroutine(individuals[i].fight());
         }
+        
     }
 
     public void adjust_scores()

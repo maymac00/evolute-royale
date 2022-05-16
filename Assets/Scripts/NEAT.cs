@@ -21,7 +21,7 @@ public static class NEAT
     public static int dropoff = 3;
     public static int max_len = 0;
     public static float step = 2.5f;
-    public static int species_pool_size = 3;
+    public static int species_pool_size = 4;
     public static float bloodrate = 1.0f;
     public static float survival_threshold = 0.334f;
 
