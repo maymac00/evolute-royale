@@ -360,6 +360,7 @@
 "Assets/Scripts/Individual.cs"
 "Assets/Scripts/IndividualFactory.cs"
 "Assets/Scripts/JSONparser.cs"
+"Assets/Scripts/kmeans.cs"
 "Assets/Scripts/Main.cs"
 "Assets/Scripts/NEAT.cs"
 "Assets/Scripts/Specie.cs"

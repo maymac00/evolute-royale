@@ -73,6 +73,7 @@
     <Compile Include="Assets\Scripts\unitBehabiour.cs" />
     <Compile Include="Assets\Scripts\Specie.cs" />
     <Compile Include="Assets\Scripts\Individual.cs" />
+    <Compile Include="Assets\Scripts\kmeans.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
