@@ -52,6 +52,8 @@ public class Generation : MonoBehaviour
         float host_thld = NEAT.distance_thld;
         float parasite_thld = NEAT.distance_thld;
 
+        Kmeans.run(host, 4);
+
         foreach (Individual ind in host)
             speciate(host_species, ind, host_thld);
 
