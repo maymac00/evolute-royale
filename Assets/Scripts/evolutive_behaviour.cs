@@ -52,7 +52,6 @@ namespace Assets.Scripts
                         return 1;
                     else
                         return 0;
-                    break;
                 case 5:
                     b = explode();
                     ind.log += "e";

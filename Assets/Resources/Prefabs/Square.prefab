@@ -29,6 +29,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -0.4501953}
   m_LocalScale: {x: 1.2, y: 1.2, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -51,14 +52,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tower: {fileID: 0}
-  healthPrefab: {fileID: 3371812161475642787, guid: b586f41d0e4a6cd42811d977e106cdac,
-    type: 3}
+  healthPrefab: {fileID: 3371812161475642787, guid: b586f41d0e4a6cd42811d977e106cdac, type: 3}
+  controller: {fileID: 0}
   health: 50
   MoveSpeed: 3
   range: 1
-  power: 10
+  power: 8
   attSpeed: 1
   direction: 0
+  targetTag: 
   targetLayer:
     serializedVersion: 2
     m_Bits: 0
@@ -99,10 +101,12 @@ SpriteRenderer:
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:

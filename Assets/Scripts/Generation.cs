@@ -172,11 +172,13 @@ public class Generation : MonoBehaviour
         foreach(Specie s in host_species)
         {
             target_games_played += ((s.individuals.Count - 1) * s.individuals.Count / 2);
+            target_games_played += s.individuals.Count; // play with coded
         }
 
         foreach (Specie s in parasite_species)
         {
             target_games_played += ((s.individuals.Count - 1) * s.individuals.Count / 2);
+            target_games_played += s.individuals.Count; // play with coded            
         }
 
         next_gen();
@@ -379,6 +381,8 @@ public class Generation : MonoBehaviour
             {
                 s.reset();
             }
+            if (hall_of_fame.Count > 0)
+                new_population.Add(Range.choice(Tournament.hall_of_fame));
             Generation.host = new_population;
         }
 
@@ -427,6 +431,8 @@ public class Generation : MonoBehaviour
             {
                 s.reset();
             }
+            if (hall_of_fame.Count > 0)
+                new_population.Add(Range.choice(Tournament.hall_of_fame));
             Generation.parasite = new_population;
         }
 
