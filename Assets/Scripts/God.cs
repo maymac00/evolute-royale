@@ -15,7 +15,7 @@ public static class Enviroment
     static public Vector3[,] grid = new Vector3[grid_size, grid_size];
     static public byte[,] arena = new byte[grid_size, grid_size];
 
-    static public int n_gens = 100;
+    static public int n_gens = 400;
 
     static public Arena getArena()
     {
@@ -138,6 +138,24 @@ public class God : MonoBehaviour
         m.enemy_ind = ind2;
         m.ally_controller = "evolutive";
         m.enemy_controller = "evolutive";
+        m.coords = new int[2] { i, j };
+        m.exec();
+    }
+
+    public static void evaluate_vs_coded(Individual ind, int index, Vector2 pos, int i, int j)
+    {
+        if (game_prefab == null)
+        {
+            game_prefab = (GameObject)Resources.Load("Prefabs/Game");
+        }
+        GameObject g = Instantiate(game_prefab, pos, Quaternion.identity);
+        g.name = "Game " + pos[0] + "," + pos[1];
+        Main m = g.GetComponentInChildren<Main>();
+        m.position = pos;
+        m.ally_ind = ind;
+        m.index = index;
+        m.ally_controller = "evolutive";
+        m.enemy_controller = "evaluator";
         m.coords = new int[2] { i, j };
         m.exec();
     }

@@ -10,7 +10,7 @@ public class coded_behaviour : Brain
     void Start()
     {
         calcSpawn();
-        int[] aux = { 0, 0, 1, 0, 0, 2, 3, 2};
+        int[] aux = { 0, 0, 1, 0, 0, 4, 2, 3, 2};
         actions = aux;
         i = 0;
         InvokeRepeating("act", 1, (float)(1 / NEAT.game_speed));
@@ -33,6 +33,9 @@ public class coded_behaviour : Brain
                 break;
             case 3:
                 r = spawnPentagon();
+                break;
+            case 4:
+                r = explode();
                 break;
         }
         if (r)

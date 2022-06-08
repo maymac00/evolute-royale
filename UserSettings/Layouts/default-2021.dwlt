@@ -19,7 +19,7 @@ MonoBehaviour:
     width: 1920
     height: 997
   m_ShowMode: 4
-  m_Title: Project
+  m_Title: Scene
   m_RootView: {fileID: 3}
   m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
@@ -145,7 +145,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 84
+  controlID: 15
 --- !u!114 &7
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -170,7 +170,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 85
+  controlID: 114
 --- !u!114 &8
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -195,7 +195,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 86
+  controlID: 115
 --- !u!114 &9
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -269,8 +269,8 @@ MonoBehaviour:
     y: 0
     width: 391
     height: 947
-  m_MinSize: {x: 101, y: 121}
-  m_MaxSize: {x: 4001, y: 4021}
+  m_MinSize: {x: 100, y: 100}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 17}
   m_Panes:
   - {fileID: 18}
@@ -524,9 +524,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 166.16333, y: 92.82998, z: 0.2464301}
+    m_Target: {x: 159.91373, y: 98.12446, z: -0.6975173}
     speed: 2
-    m_Value: {x: 166.16333, y: 92.82998, z: 0.2464301}
+    m_Value: {x: 161.02682, y: 96.87644, z: -0.75452137}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -577,9 +577,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0, y: 0, z: 0, w: 1}
   m_Size:
-    m_Target: 113.42994
+    m_Target: 120.97494
     speed: 2
-    m_Value: 113.42994
+    m_Value: 126.67532
   m_Ortho:
     m_Target: 1
     speed: 2
@@ -635,25 +635,25 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: ba650000
+      m_SelectedIDs: 
       m_LastClickedID: 0
-      m_ExpandedIDs: da7554fb988c54fb9a8c54fbe252f8fcd2b704fd02c904fd04c904fd0c3105fd6c4305fd6e4305fd945b7cfd825981fd86d295fd5adfc8fd0429d2fdf4840dfef6910dfef8910dfeb2b0ecfe06b347fff69e7aff4a6c7cff5aecdeff96ecdeff10eddeff5222dfff5422dfff9222dfff28fbffff
+      m_ExpandedIDs: 82f629d0d8fa29d000fc29d094fc29d0c2ff29d0a0002ad04c4c2bd04e4c2bd0aceb64de0a3f37ea7e4037ea664a37eae86137eaea6137ea92d237f5d2f83bf50a1c3cf50c1c3cf57e1c3cf5f41c3cf5ea57ffffba5dffffbc5dffff125effff286dffff2a6dffffde7fffffe07fffff30fbffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
-        m_Name: Game
-        m_OriginalName: Game
+        m_Name: 
+        m_OriginalName: 
         m_EditFieldRect:
           serializedVersion: 2
           x: 0
           y: 0
           width: 0
           height: 0
-        m_UserData: -2153902
+        m_UserData: 0
         m_IsWaitingForDelay: 0
         m_IsRenaming: 0
-        m_OriginalEventType: 0
+        m_OriginalEventType: 11
         m_IsRenamingFilename: 0
-        m_ClientGUIView: {fileID: 2}
+        m_ClientGUIView: {fileID: 11}
       m_SearchString: 
     m_ExpandedScenes: []
     m_CurrenRootInstanceID: 0
@@ -822,22 +822,22 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Scripts
+    - Assets
     m_Globs: []
     m_OriginalText: 
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/Scripts
+  - Assets
   m_LastFoldersGridSize: -1
   m_LastProjectPath: C:\Users\Arnau\Documents\TFG-NEAT in strategy games
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: e4500000
-    m_LastClickedID: 20708
-    m_ExpandedIDs: 00000000c0500000e050000000ca9a3b
+    m_SelectedIDs: bc500000
+    m_LastClickedID: 20668
+    m_ExpandedIDs: 00000000bc50000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -865,7 +865,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000c0500000
+    m_ExpandedIDs: 00000000bc500000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -983,7 +983,7 @@ MonoBehaviour:
     m_CachedPref: 160
     m_ControlHash: -371814159
     m_PrefName: Preview_InspectorPreview
-  m_LastInspectedObjectInstanceID: 26042
+  m_LastInspectedObjectInstanceID: -1
   m_LastVerticalScrollValue: 0
   m_GlobalObjectId: 
   m_InspectorMode: 0

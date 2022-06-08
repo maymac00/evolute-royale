@@ -344,11 +344,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2913059538841458270, guid: 3708f78c9bd47fc4d86d49c8560acfe4, type: 3}
       propertyPath: ally_controller
-      value: controlled
+      value: coded
       objectReference: {fileID: 0}
     - target: {fileID: 2913059538841458270, guid: 3708f78c9bd47fc4d86d49c8560acfe4, type: 3}
       propertyPath: enemy_controller
-      value: controlled
+      value: Individual-8-2235_14-29.json
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3708f78c9bd47fc4d86d49c8560acfe4, type: 3}

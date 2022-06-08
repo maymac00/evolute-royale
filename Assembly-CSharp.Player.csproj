@@ -66,6 +66,7 @@
     <Compile Include="Assets\Scripts\NEAT.cs" />
     <Compile Include="Assets\Scripts\towerBehabiour.cs" />
     <Compile Include="Assets\Scripts\JSONparser.cs" />
+    <Compile Include="Assets\Scripts\kmeans.cs" />
     <Compile Include="Assets\Scripts\Utils.cs" />
     <Compile Include="Assets\Scripts\Tournament.cs" />
     <Compile Include="Assets\Scripts\ConnectionGene.cs" />
@@ -73,7 +74,7 @@
     <Compile Include="Assets\Scripts\unitBehabiour.cs" />
     <Compile Include="Assets\Scripts\Specie.cs" />
     <Compile Include="Assets\Scripts\Individual.cs" />
-    <Compile Include="Assets\Scripts\kmeans.cs" />
+    <Compile Include="Assets\Scripts\Evaluator.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

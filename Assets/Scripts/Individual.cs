@@ -111,6 +111,22 @@ public class Individual : IComparable, ICloneable
 
     }
 
+    public IEnumerator evaluate(int index)
+    {
+        Arena a = Enviroment.getArena();
+        while (a is null)
+        {
+            WaitForSeconds w = new WaitForSeconds(1.0f);
+            yield return w;
+            a = Enviroment.getArena();
+        }
+        int i = a.coords[0];
+        int j = a.coords[1];
+        God.evaluate_vs_coded(this, index, a.pos, i, j);
+
+        yield return null;
+    }
+
     public void mutate()
     {
         if (Random.Range(0, 1) < 0.8f)

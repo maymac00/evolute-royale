@@ -40,6 +40,7 @@ public abstract class Brain : MonoBehaviour
             gold -= 3;
             GameObject sq = Object.Instantiate(prefabSquare, spawnPoints[0], Quaternion.identity);
             unitBehabiour src = sq.GetComponent<unitBehabiour>();
+            src.controller = this;
             sq.GetComponent<SpriteRenderer>().color = src.direction == 1 ? Color.green : Color.red;
             sq.transform.SetParent(gameObject.transform.parent);
             src.tower = target;
@@ -49,6 +50,7 @@ public abstract class Brain : MonoBehaviour
             sq.layer = src.direction == 1 ? 8 : 9;
             sq.GetComponent<SpriteRenderer>().color = src.direction == 1 ? Color.green : Color.red;
             sq.name = src.direction == 1 ? "Ally" : "Enemy";
+            src.unit = "s";
 
             units[0] += 1;
             return true;
@@ -64,6 +66,7 @@ public abstract class Brain : MonoBehaviour
             gold -= 3;
             GameObject sq = Object.Instantiate(prefabDiamond, spawnPoints[1], Quaternion.identity);
             unitBehabiour src = sq.GetComponent<unitBehabiour>();
+            src.controller = this;
             sq.transform.SetParent(gameObject.transform.parent);
             src.tower = target;
             src.direction = direction;
@@ -73,6 +76,7 @@ public abstract class Brain : MonoBehaviour
             sq.GetComponent<SpriteRenderer>().color = src.direction == 1 ? Color.green : Color.red;
             sq.name = src.direction == 1 ? "Ally" : "Enemy";
             units[1] += 1;
+            src.unit = "d";
             return true;
         }
         return false;
@@ -86,6 +90,7 @@ public abstract class Brain : MonoBehaviour
             gold -= 5;
             GameObject sq = Object.Instantiate(prefabTriangle, spawnPoints[2], Quaternion.identity);
             unitBehabiour src = sq.GetComponent<unitBehabiour>();
+            src.controller = this;
             sq.transform.SetParent(gameObject.transform.parent);
             src.tower = target;
             src.direction = direction;
@@ -95,6 +100,7 @@ public abstract class Brain : MonoBehaviour
             sq.GetComponent<SpriteRenderer>().color = src.direction == 1 ? Color.green : Color.red;
             sq.name = src.direction == 1 ? "Ally" : "Enemy";
             units[2] += 1;
+            src.unit = "t";
             return true;
         }
         return false;
@@ -108,6 +114,7 @@ public abstract class Brain : MonoBehaviour
             gold -= 5;
             GameObject sq = Object.Instantiate(prefabPentagon, spawnPoints[3], Quaternion.identity);
             unitBehabiour src = sq.GetComponent<unitBehabiour>();
+            src.controller = this;
             sq.transform.SetParent(gameObject.transform.parent);
             src.tower = target;
             src.direction = direction;
@@ -118,6 +125,7 @@ public abstract class Brain : MonoBehaviour
             sq.GetComponent<SpriteRenderer>().color = src.direction == 1 ? Color.green : Color.red;
             sq.name = src.direction == 1 ? "Ally" : "Enemy";
             units[3] += 1;
+            src.unit = "p";
             return true;
         }
         return false;
@@ -174,6 +182,7 @@ public class Main : MonoBehaviour
 
     public int speed;
 
+    public int index;
 
     public int timer = 0;
     public int time_limit = 120;
@@ -271,6 +280,19 @@ public class Main : MonoBehaviour
                 brain_enemy = new GameObject("enemyBrain");
                 brain_enemy.transform.SetParent(gameObject.transform.parent);
                 coded_behaviour src_cod = brain_enemy.AddComponent<coded_behaviour>();
+                src_cod.target = gameObject.transform.parent.transform.GetChild(0).gameObject;
+                src_cod.myTower = gameObject.transform.parent.transform.GetChild(1).gameObject;
+                src_cod.prefabSquare = (GameObject)Resources.Load("Prefabs/Square", typeof(GameObject));
+                src_cod.prefabTriangle = (GameObject)Resources.Load("Prefabs/Triangle", typeof(GameObject));
+                src_cod.prefabPentagon = (GameObject)Resources.Load("Prefabs/Pentagon", typeof(GameObject));
+                src_cod.prefabDiamond = (GameObject)Resources.Load("Prefabs/Diamond", typeof(GameObject));
+                src_cod.direction = -1;
+                break;
+                
+            case "evaluator":
+                brain_enemy = new GameObject("enemyBrain");
+                brain_enemy.transform.SetParent(gameObject.transform.parent);
+                src_cod = brain_enemy.AddComponent<coded_behaviour>();
                 src_cod.target = gameObject.transform.parent.transform.GetChild(0).gameObject;
                 src_cod.myTower = gameObject.transform.parent.transform.GetChild(1).gameObject;
                 src_cod.prefabSquare = (GameObject)Resources.Load("Prefabs/Square", typeof(GameObject));
@@ -423,7 +445,7 @@ public class Main : MonoBehaviour
             e = (evolutive_behaviour)enemy;
         }
         catch { e = null; }
-
+        
         if (a != null)
         {
             ally_violations += a.act(ally_input);
@@ -432,7 +454,16 @@ public class Main : MonoBehaviour
         {
             enemy_violations += e.act(enemy_input);
         }
-
+        /*
+        if (a != null)
+        {
+            ally_violations += a.act(new float[] { ally_input[0], ally_input[1], ally_input[2], ally_input[3], ally_input[4], ally_input[6], ally_input[7], ally_input[8], ally_input[9], ally_input[10] });
+        }
+        if (e != null)
+        {
+            enemy_violations += e.act(new float[] { enemy_input[0], enemy_input[1], enemy_input[2], enemy_input[3], enemy_input[4], enemy_input[6], enemy_input[7], enemy_input[8], enemy_input[9], enemy_input[10] });
+        }
+        */
     }
     
     public void endGame(int diff)
@@ -444,6 +475,8 @@ public class Main : MonoBehaviour
         
         int penalty(int x)
         {
+            if(!NEAT.penalty)
+                return 0;
             float var;
             if (Generation.n_gen < 25.0f)
             {
@@ -455,6 +488,20 @@ public class Main : MonoBehaviour
             }
             return (int)var;
         }
+
+        if(enemy_controller == "evaluator")
+        {
+            Evaluator.fitness_progress[index] = 100 + Mathf.Abs(diff) - penalty(enemy_violations);
+            CancelInvoke("secondUpdate");
+            if (ally_controller == "evolutive" || enemy_controller == "evolutive")
+                CancelInvoke("evolutive");
+
+            Enviroment.arena[coords[0], coords[1]] = 0;
+            //gameFinishedEvent(this);
+            Destroy(gameObject.transform.parent.gameObject, 1f);
+            return;
+        }
+        
         
         if (!Tournament.playing)
         {
@@ -470,7 +517,10 @@ public class Main : MonoBehaviour
                 .Select(group => group.Count())
                 .ToList();
                 ally_ind.wins += 1;
-                int rwd = (int)(200 - penalty(ally_violations) + 10 * (r.Count > 2 ? r.Count : 0));
+                int rwd = (int)(100+Mathf.Abs(diff) - penalty(enemy_violations) + 10 * (r.Count > 2 ? r.Count : 0));
+
+                if (enemy_controller == "coded")
+                    rwd += 100;
                 ally_ind.fitness += Math.Max(rwd, 0);
             }
             else if (winner == 1)
@@ -484,7 +534,7 @@ public class Main : MonoBehaviour
                     .ToList();
                     enemy_ind.wins += 1;
                     enemy_ind.violations = enemy_violations;
-                    int rwd = (int)(200 - penalty(enemy_violations) + 10 * (r.Count > 2 ? r.Count : 0));
+                    int rwd = (int)(100 + Mathf.Abs(diff) - penalty(enemy_violations) + 10 * (r.Count > 2 ? r.Count : 0));
                     enemy_ind.fitness += Math.Max(rwd, 0);
                 }
                    
@@ -497,7 +547,7 @@ public class Main : MonoBehaviour
                 .GroupBy(c => c)
                 .Select(group => group.Count())
                 .ToList();
-                ally_ind.fitness += Math.Max(50 - penalty(ally_violations) + 20 * (r.Count > 2 ? r.Count:0), 0) ;
+                ally_ind.fitness += Math.Max(50- penalty(enemy_violations) + 20 * (r.Count > 2 ? r.Count:0), 0) ;
                 if (enemy_controller == "evolutive")
                 {
                     r = enemy_ind.log
@@ -505,7 +555,7 @@ public class Main : MonoBehaviour
                     .Select(group => group.Count())
                     .ToList();
                     enemy_ind.violations = enemy_violations;
-                    enemy_ind.fitness += Math.Max(50 - penalty(ally_violations) + 20 * (r.Count > 2 ? r.Count : 0), 0);
+                    enemy_ind.fitness += Math.Max(50 - penalty(enemy_violations) + 20 * (r.Count > 2 ? r.Count : 0), 0);
                 }
                     
             }
@@ -526,7 +576,9 @@ public class Main : MonoBehaviour
                     .ToList();
                     // Ally wins
                     ally_ind.violations = ally_violations;
-                    int rwd = (int)(200 - penalty(ally_violations) + 10 * (r.Count > 2 ? r.Count : 0));
+                    int rwd = (int)(100 + Mathf.Abs(diff) - penalty(enemy_violations) + 10 * (r.Count > 2 ? r.Count : 0));
+                    if (enemy_controller == "coded")
+                        rwd += 100;
                     ally_ind.specie.tournament_wins += Math.Max(rwd, 0);
                 }
             }
@@ -541,7 +593,7 @@ public class Main : MonoBehaviour
                         .ToList();
                         // Enemy wins
                         enemy_ind.violations = enemy_violations;
-                        int rwd = (int)(200 - penalty(enemy_violations) + 10 * (r.Count > 2 ? r.Count : 0));
+                        int rwd = (int)(100 + Mathf.Abs(diff) - penalty(enemy_violations) + 10 * (r.Count > 2 ? r.Count : 0));
                         enemy_ind.specie.tournament_wins += Math.Max(rwd, 0);
                     } 
                 }
@@ -554,7 +606,7 @@ public class Main : MonoBehaviour
                    .Select(group => group.Count())
                    .ToList();
                 if (ally_ind.specie != null)
-                    ally_ind.specie.tournament_wins += Math.Max(50 - penalty(ally_violations) + 10 * (r.Count > 2 ? r.Count : 0), 0);
+                    ally_ind.specie.tournament_wins += Math.Max(50 - penalty(enemy_violations) + 10 * (r.Count > 2 ? r.Count : 0), 0);
 
                 if (enemy_controller == "evolutive")
                 {
@@ -563,7 +615,7 @@ public class Main : MonoBehaviour
                     .Select(group => group.Count())
                     .ToList();
                     if (enemy_ind.specie != null)
-                        enemy_ind.specie.tournament_wins += Math.Max(50 - penalty(ally_violations) + 20 * (r.Count > 2 ? r.Count : 0), 0);
+                        enemy_ind.specie.tournament_wins += Math.Max(50 - penalty(enemy_violations) + 20 * (r.Count > 2 ? r.Count : 0), 0);
                 }
             }
 

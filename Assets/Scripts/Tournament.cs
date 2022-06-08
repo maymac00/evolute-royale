@@ -72,9 +72,10 @@ public class Tournament : MonoBehaviour
                 }
             }
 
-            int n = (participants.Count-1);
-            hall_of_fame.Add((Individual)champion.Clone());
-            champion.save("Individual-"+Generation.n_gen+"-"+champion.specie.tournament_wins+"_"+n+"-"+champion.genome.Count+".json");
+            Individual copy = (Individual)champion.Clone();
+            copy.fitness = champion.specie.tournament_wins;
+            hall_of_fame.Add(copy);
+            champion.save("Individual-"+Generation.n_gen+"-"+champion.specie.tournament_wins+"_"+ (target_games/participants.Count) + "-"+champion.genome.Count+".json");
             
 
             if (Generation.n_gen < Enviroment.n_gens)

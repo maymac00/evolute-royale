@@ -13,7 +13,7 @@ public class unitBehabiour : MonoBehaviour, IUnit
     public GameObject tower;
     public GameObject healthPrefab;
     public Brain controller;
-
+    public string unit = "";
 
     //STATS
     public int health;
@@ -44,7 +44,15 @@ public class unitBehabiour : MonoBehaviour, IUnit
         //am i dead
         if(health <= 0)
         {
-
+            if (unit == "s")
+                controller.units[0]--;
+            if (unit == "d")
+                controller.units[1]--;
+            if (unit == "t")
+                controller.units[2]--;
+            if (unit == "p")
+                controller.units[3]--;
+            
             Destroy(gameObject);
         }
 

@@ -48,64 +48,90 @@ public class Generation : MonoBehaviour
         Individual.gen = this;
 
         // Speciation
-        NEAT.distance_thld += 0.3f;
-        float host_thld = NEAT.distance_thld;
-        float parasite_thld = NEAT.distance_thld;
+        //fenotype
+        if (NEAT.distance_type == "fenotype")
+        {
+            Kmeans.run(host_species, host, NEAT.species_pool_size);
+            Kmeans.run(parasite_species, parasite, NEAT.species_pool_size);
 
-        Kmeans.run(host, 4);
-
-        foreach (Individual ind in host)
-            speciate(host_species, ind, host_thld);
-
-        foreach (Individual ind in parasite)
-            speciate(parasite_species, ind, parasite_thld);
-
-        int try_count = 0;
-        while ((host_species.Count < 3 || host_species.Count > 7 || parasite_species.Count < 3 || parasite_species.Count > 7) && try_count < 20) 
-        { 
-            if (host_species.Count < NEAT.species_pool_size)
-                host_thld -= UnityEngine.Random.Range(0.2f, 0.6f);
-            else if (host_species.Count > NEAT.species_pool_size * 1.75f)
-                host_thld += UnityEngine.Random.Range(0.2f, 0.6f);
-
-            if (host_thld < 0.3)
+            if (UnityEngine.Random.Range(0, 1) > 0.75f)
             {
-                host_thld = 0.3f;
-                break;
+                if (UnityEngine.Random.Range(0, 1) > 0.5f)
+                    NEAT.species_pool_size++;
+                else
+                    NEAT.species_pool_size--;
+
+                if(NEAT.species_pool_size < 3)
+                {
+                    NEAT.species_pool_size = 3;
+                }
+                if (NEAT.species_pool_size > 8)
+                {
+                    NEAT.species_pool_size = 8;
+                }
             }
+            
+        }
+        //genotype
+        else
+        {
+            NEAT.distance_thld += 0.3f;
+            float host_thld = NEAT.distance_thld;
+            float parasite_thld = NEAT.distance_thld;
 
-            if (parasite_species.Count < NEAT.species_pool_size)
-                parasite_thld -= UnityEngine.Random.Range(0.2f, 0.6f);
-            else if (parasite_species.Count > NEAT.species_pool_size * 1.2f)
-                parasite_thld += UnityEngine.Random.Range(0.2f, 0.6f);
-
-            if (parasite_thld < 0.3)
-            {
-                parasite_thld = 0.3f;
-                break;
-            }
-
-            foreach (Specie specie in host_species)
-                specie.reset();
-            foreach (Specie specie in parasite_species)
-                specie.reset();
-
-            foreach (Individual ind in host) 
-            {
-                ind.specie = null;
+            foreach (Individual ind in host)
                 speciate(host_species, ind, host_thld);
-            }
 
             foreach (Individual ind in parasite)
-            {
-                ind.specie = null;
                 speciate(parasite_species, ind, parasite_thld);
+
+            int try_count = 0;
+            while ((host_species.Count < 3 || host_species.Count > 7 || parasite_species.Count < 3 || parasite_species.Count > 7) && try_count < 20)
+            {
+                if (host_species.Count < NEAT.species_pool_size)
+                    host_thld -= UnityEngine.Random.Range(0.2f, 0.6f);
+                else if (host_species.Count > NEAT.species_pool_size * 1.75f)
+                    host_thld += UnityEngine.Random.Range(0.2f, 0.6f);
+
+                if (host_thld < 0.3)
+                {
+                    host_thld = 0.3f;
+                    break;
+                }
+
+                if (parasite_species.Count < NEAT.species_pool_size)
+                    parasite_thld -= UnityEngine.Random.Range(0.2f, 0.6f);
+                else if (parasite_species.Count > NEAT.species_pool_size * 1.2f)
+                    parasite_thld += UnityEngine.Random.Range(0.2f, 0.6f);
+
+                if (parasite_thld < 0.3)
+                {
+                    parasite_thld = 0.3f;
+                    break;
+                }
+
+                foreach (Specie specie in host_species)
+                    specie.reset();
+                foreach (Specie specie in parasite_species)
+                    specie.reset();
+
+                foreach (Individual ind in host)
+                {
+                    ind.specie = null;
+                    speciate(host_species, ind, host_thld);
+                }
+
+                foreach (Individual ind in parasite)
+                {
+                    ind.specie = null;
+                    speciate(parasite_species, ind, parasite_thld);
+                }
+
+                host_species.RemoveAll(s => s.individuals.Count == 0);
+                parasite_species.RemoveAll(s => s.individuals.Count == 0);
+
+                try_count++;
             }
-
-            host_species.RemoveAll(s => s.individuals.Count == 0);
-            parasite_species.RemoveAll(s => s.individuals.Count == 0);
-
-            try_count++;
         }
 
         //remove empty species
@@ -431,8 +457,21 @@ public class Generation : MonoBehaviour
             {
                 s.reset();
             }
-            if (hall_of_fame.Count > 0)
-                new_population.Add(Range.choice(Tournament.hall_of_fame));
+
+            // Sort hall of fame by fitness
+            hall_of_fame.Sort(delegate (Individual a, Individual b)
+            {
+                return b.fitness.CompareTo(a.fitness);
+            });
+
+            if (hall_of_fame.Count > 0) {
+                if (hall_of_fame.Count > 30) {
+                    new_population.Add(Range.choice(Tournament.hall_of_fame.GetRange(hall_of_fame.Count - 10, 10)));
+                } 
+                else
+                    new_population.Add(Range.choice(Tournament.hall_of_fame));
+            }
+                
             Generation.parasite = new_population;
         }
 

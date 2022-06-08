@@ -20,8 +20,8 @@ public static class NEAT
 
     public static int dropoff = 3;
     public static int max_len = 0;
-    public static float step = 2.5f;
-    public static int species_pool_size = 4;
+    public static float step = 1.5f;
+    public static int species_pool_size = 7;
     public static float bloodrate = 1.0f;
     public static float survival_threshold = 0.334f;
 
@@ -36,6 +36,9 @@ public static class NEAT
     public static string activation_function = "relu";
     public static string inner_activation_function = "relu";
     
+    //internal static string distance_type = "fenotype";
+    internal static string distance_type = "genotype";
+    internal static bool penalty = false;
 
     public static void check_innovation(ConnectionGene connectionGene)
     {
